@@ -7,7 +7,7 @@ abstract class GameEntity {
 	private int			xCoord;
 	private int			yCoord;
 	private int 		rangeOfAttack;
-	static int			id;
+	static int			id = 0;
 
 
 	public int getRangeOfAttack() {
@@ -58,6 +58,6 @@ abstract class GameEntity {
 		this.yCoord = yCoord;
 	}
 
-	abstract public int distance();
+	abstract public int distance(GameEntity entity);
 
 }
