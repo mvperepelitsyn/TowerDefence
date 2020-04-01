@@ -1,5 +1,6 @@
 package TDGame;
 
+import TDEntities.Enemy;
 import TDEntities.Tower;
 
 import java.util.ArrayList;
@@ -10,6 +11,12 @@ public class GameCycle {
 	public static void gameCycle() {
 		Scanner scan = new Scanner(System.in);
 		short[][] map = getMap(scan);
+		ArrayList<Tower> towers = new ArrayList<Tower>();
+		ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+		while (true) {
+			action(scan, towers, map);
+
+		}
 
 
 	}
@@ -30,7 +37,7 @@ public class GameCycle {
 		return new short[n][m];
 	}
 
-	static void action(Scanner scan, ArrayList<Tower> lstTowers) {
+	static void action(Scanner scan, ArrayList<Tower> lstTowers, short[][] map) {
 		System.out.println("Please input the action, that you want to perform. Type \"usage\" " +
 				"if you don't know the actions.");
 		String strAction;
