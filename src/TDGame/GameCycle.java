@@ -18,9 +18,24 @@ public class GameCycle {
 		HashMap<Long, Enemy> enemies = new LinkedHashMap<Long, Enemy>();
 		while (true) {
 			action(scan, towers, enemies, map);
+			for (Map.Entry<Long, Tower> entry : towers.entrySet()) {
+				Tower tmp = entry.getValue();
+				System.out.println("x: " + tmp.getxCoord() + " y: " + tmp.getyCoord() + " h: " +
+						tmp.getHealthPoints() + " d: " + tmp.getDmgPoints() + " s: " + tmp.getSpeed() +
+						" r: " + tmp.getRangeOfAttack());
+			}
+			showMap(map);
+			System.out.println();
 			doTurn(towers,enemies,map);
 			addEnemy(towers, enemies, map);
+			for (Map.Entry<Long, Enemy> entry : enemies.entrySet()) {
+				Enemy tmp = entry.getValue();
+				System.out.println("x: " + tmp.getxCoord() + " y: " + tmp.getyCoord() + " h: " +
+						tmp.getHealthPoints() + " d: " + tmp.getDmgPoints() + " s: " + tmp.getSpeed() +
+						" r: " + tmp.getRangeOfAttack());
+			}
 			showMap(map);
+			System.out.println();
 		}
 	}
 
@@ -67,9 +82,10 @@ public class GameCycle {
 			}
 			//turn based
 			map[y_en][x_en] = '*';
-			boolean flag = false;
+			boolean flag = x_en - speed_enemy < 0;
 			int distance = map[0].length + 1; //more than can be
-			for (int i = x_en - 1; i >= x_en - speed_enemy; i--) {
+			int low = (flag) ? 0 : x_en - speed_enemy;
+			for (int i = x_en - 1; i >= low; i--) {
 				if (map[y_en][i] == 'T' || map[y_en][i] == 'E') {
 					distance = x_en - i;
 					break;
@@ -86,9 +102,15 @@ public class GameCycle {
 			}
 			it_e.remove();
 			new_enemies.put(coordHash(x_en,y_en),tmp_enemy);
-			map[y_en][x_en] = 'E';
+			if (x_en > 0) {
+				map[y_en][x_en] = 'E';
+			}
+			else {
+				System.out.println("RIP");
+				System.exit(0);
+			}
 		}
-		enemies = new_enemies;
+		enemies.putAll(new_enemies);
 	}
 
 	private static void showMap(char[][] map) {
@@ -240,7 +262,7 @@ public class GameCycle {
 		Random rnd = new Random();
 		for (int i = 0; i < count; i++) {
 			rndRow = rnd.nextInt(rows);
-			a = coordHash(rndRow, map[0].length - 1);
+			a = coordHash(map[0].length - 1,rndRow);
 			if (!(towers.containsKey(a) || enemies.containsKey(a))) {
 				enemies.put(a, new Enemy(rnd.nextInt(100) + 1, rnd.nextInt(100) + 1,
 						rnd.nextInt((map[0].length - 1) / 3) + 1, map[0].length - 1, rndRow,
