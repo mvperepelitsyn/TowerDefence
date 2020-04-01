@@ -1,63 +1,26 @@
 package TDEntities;
 
 abstract class GameEntity {
-	private int			healthPoints;
-	private int			dmgPoints;
-	private int			speed;
-	private int			xCoord;
-	private int			yCoord;
-	private int 		rangeOfAttack;
-	static int			id;
+	static int id = 0;
 
+	abstract public int getRangeOfAttack();
 
-	public int getRangeOfAttack() {
-		return rangeOfAttack;
-	}
+	abstract public int getHealthPoints();
 
-	public void setRangeOfAttack(int rangeOfAttack) {
-		this.rangeOfAttack = rangeOfAttack;
-	}
+	abstract public void setHealthPoints(int healthPoints);
 
-	public int getHealthPoints() {
-		return healthPoints;
-	}
+	abstract public int getDmgPoints();
 
-	public void setHealthPoints(int healthPoints) {
-		this.healthPoints = healthPoints;
-	}
+	abstract public int getSpeed();
 
-	public int getDmgPoints() {
-		return dmgPoints;
-	}
+	abstract public int getxCoord();
 
-	public void setDmgPoints(int dmgPoints) {
-		this.dmgPoints = dmgPoints;
-	}
+	abstract public void setxCoord(int xCoord);
 
-	public int getSpeed() {
-		return speed;
-	}
+	abstract public int getyCoord();
 
-	public void setSpeed(int speed) {
-		this.speed = speed;
-	}
+	abstract public void setyCoord(int yCoord);
 
-	public int getxCoord() {
-		return xCoord;
-	}
-
-	public void setxCoord(int xCoord) {
-		this.xCoord = xCoord;
-	}
-
-	public int getyCoord() {
-		return yCoord;
-	}
-
-	public void setyCoord(int yCoord) {
-		this.yCoord = yCoord;
-	}
-
-	abstract public int distance();
+	abstract public int distance(GameEntity o);
 
 }
