@@ -4,6 +4,7 @@ import TDEntities.Enemy;
 import TDEntities.Tower;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class GameCycle {
@@ -23,15 +24,25 @@ public class GameCycle {
 
 	static short[][] getMap(Scanner scan) {
 		int n = 0, m = 0;
-		System.out.println("Please input n and m. The size of the map.");
+		String[] tmp = new String[2];
+		System.out.println("Please input n and m. The size of the map. The numbers have to be integers.");
 		while (true) {
 			try {
-				n = scan.nextInt();
-				m = scan.nextInt();
+				tmp[0] = scan.next();
+				tmp[1] = scan.next();
+				n = Integer.parseInt(tmp[0]);
+				m = Integer.parseInt(tmp[1]);
 				//TODO: We need to check the numbers anyway, even if didn't get the exception.
+				if (n <= 0 || m <= 0) {
+					System.out.println("One of the numbers is zero or less than zero. Make it greater than zero.");
+					continue;
+				} else if ((long)n * m > 2147483647) {
+					System.out.println("The numbers are too big for a map. Make them smaller.");
+					continue;
+				}
 				break;
-			} catch (Exception e) {
-				System.out.println("Wrong format of input data. Try again.");
+			} catch (InputMismatchException | NumberFormatException | OutOfMemoryError e) {
+				System.out.println("Error. Wrong format of input data. Try again.");
 			}
 		}
 		return new short[n][m];
@@ -41,24 +52,29 @@ public class GameCycle {
 		System.out.println("Please input the action, that you want to perform. Type \"usage\" " +
 				"if you don't know the actions.");
 		String strAction;
-		while (true) {
+		loop : while (true) {
 			strAction = scan.next();
 			if (strAction != null) {
-				if (strAction.equals("usage")) {
-					System.out.printf("Actions:\nadd - to add new Tower\n" +
-							"delete - to delete an old Tower\n" +
-							"skip - to skip the turn\n" +
-							"stop - to stop the game\n");
-				} else if (strAction.equals("stop")) {
-					System.exit(0);
-				} else if (strAction.equals("add")) {
-					//new method to add the Tower
-				} else if (strAction.equals("delete")) {
-					//new method to delete the Tower
-				} else if (strAction.equals("skip")) {
-					break ;
-				} else {
-					System.out.println("Unknown action. Try again.");
+				switch (strAction) {
+					case ("usage") :
+						System.out.printf("Actions:\nadd - to add new Tower\n" +
+								"delete - to delete an old Tower\n" +
+								"skip - to skip the turn\n" +
+								"stop - to stop the game\n");
+						break;
+					case ("stop") :
+						System.exit(0);
+						break;
+					case ("add") :
+						//new method to add a Tower
+						break;
+					case ("delete") :
+						//new method to delete a Tower
+						break;
+					case ("skip") :
+						break loop;
+					default:
+						System.out.println("Unknown action. Try again.");
 				}
 			}
 		}
