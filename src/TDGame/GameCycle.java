@@ -103,7 +103,7 @@ public class GameCycle {
 				x = Integer.parseInt(tmp[0]);
 				y = Integer.parseInt(tmp[1]);
 				if (x < 0 || y < 0 || y >= n || x > m) {
-					System.out.println("Range error");
+					System.out.println("The coordinates are out of reach. Try again:");
 					continue;
 				}
 				else {
@@ -128,31 +128,36 @@ public class GameCycle {
 		int x = 0, y = 0, n = map.length, m = map[0].length;;
 		String[] tmp = new String[2];
 		Tower tmpTower;
-		System.out.println("Please input the coordinates of Tower you want to delete:");
-		while (true) {
-			try {
-				tmp[0] = scan.next();
-				tmp[1] = scan.next();
-				x = Integer.parseInt(tmp[0]);
-				y = Integer.parseInt(tmp[1]);
-				if (x >= map.length || y >= map[0].length || x < 0 || y < 0) {
-					System.out.println("Please input 0<=x<" + m + " and 0<=y<" + n +
-							". The coordinates of tower. The numbers have to be integers.");
-					continue;
+		if (!towers.isEmpty()) {
+			System.out.println("Please input 0<=x<" + m + " and 0<=y<" + n +
+					". The coordinates of tower. The numbers have to be integers.");
+			while (true) {
+				try {
+					tmp[0] = scan.next();
+					tmp[1] = scan.next();
+					x = Integer.parseInt(tmp[0]);
+					y = Integer.parseInt(tmp[1]);
+					if (x >= n || y >= m || x < 0 || y < 0) {
+						System.out.println("The coordinates are out of reach. Try again:");
+						continue;
+					} else {
+						long a = coordHash(x, y);
+						if (towers.containsKey(a)) {
+							towers.remove(a);
+							map[x][y] = '*';
+						} else {
+							System.out.println("No such tower!");
+							continue;
+						}
+					}
+					break;
+				} catch (InputMismatchException | NumberFormatException | OutOfMemoryError e) {
+					System.out.println("Error. Wrong format of input data. Try again:");
 				}
-				tmpTower = new Tower(x, y);
-//				if (!towers.contains(tmpTower)) { //we need Artem's function over here. In order to do it
-//					System.out.println("There is no Tower with such coordinates. You want to try again?" +
-//							" Y or N?");
-//					tmp[0] = scan.nextLine();
-//					if (tmp[0] != null && tmp[0].equals("Y")) {
-//						continue;
-//					}
-//				}
-				break;
-			} catch (InputMismatchException | NumberFormatException | OutOfMemoryError e) {
-				System.out.println("Error. Wrong format of input data. Try again:");
 			}
+		}
+		else {
+			System.out.println("There are no towers!");
 		}
 	}
 
