@@ -8,7 +8,7 @@ public class Tower extends GameEntity {
 	private int					yCoord;
 	private final int 			rangeOfAttack = 5;
 	final static int 			id = 1;
-	public final char 			graphic = 'T';
+	public static final char 	graphic = 'T';
 
 	//other variables are basic
 	public Tower(int xCoord, int yCoord) {

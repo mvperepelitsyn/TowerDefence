@@ -1,29 +1,41 @@
 package TDGame;
 
 import TDEntities.Enemy;
+import TDEntities.GameEntity;
 import TDEntities.Tower;
 
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
 
 public class GameCycle {
 
 	public static void gameCycle() {
 		Scanner scan = new Scanner(System.in);
-		short[][] map = getMap(scan);
-		ArrayList<Tower> towers = new ArrayList<Tower>();
-		ArrayList<Enemy> enemies = new ArrayList<Enemy>();
-		while (true) {
-			action(scan, towers, map);
-
+		char[][] map = getMap(scan);
+		//fill map with spaces
+		for (int i = 0; i < map.length; i++) {
+			Arrays.fill(map[i],'*');
 		}
-
-
+		HashMap<Long, Tower> towers = new HashMap<>();
+		HashMap<Long, Enemy> enemies = new HashMap<>();
+		while (true) {
+			action(scan, towers, enemies, map);
+			showMap(map);
+		}
 	}
 
-	static short[][] getMap(Scanner scan) {
-		int n = 0, m = 0;
+	private static void showMap(char[][] map) {
+		int n = map.length;
+		int m = map[0].length;
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				System.out.print(map[i][j]);
+			}
+			System.out.println();
+		}
+	}
+
+	static char[][] getMap(Scanner scan) {
+		int n, m;
 		String[] tmp = new String[2];
 		System.out.println("Please input n and m. The size of the map. The numbers have to be integers.");
 		while (true) {
@@ -35,7 +47,6 @@ public class GameCycle {
 				//TODO: We need to check the numbers anyway, even if didn't get the exception.
 				if (n <= 0 || m <= 0) {
 					System.out.println("One of the numbers is zero or less than zero. Make it greater than zero.");
-					continue;
 				} else if ((long)n * m > 2147483647) {
 					System.out.println("The numbers are too big for a map. Make them smaller.");
 					continue;
@@ -45,14 +56,15 @@ public class GameCycle {
 				System.out.println("Error. Wrong format of input data. Try again.");
 			}
 		}
-		return new short[n][m];
+		return new char[n][m];
 	}
 
-	static void action(Scanner scan, ArrayList<Tower> lstTowers, short[][] map) {
+	static void action(Scanner scan, HashMap<Long, Tower> lstTowers, HashMap<Long, Enemy> lstEnemies, char[][] map) {
 		System.out.println("Please input the action, that you want to perform. Type \"usage\" " +
 				"if you don't know the actions.");
 		String strAction;
-		loop : while (true) {
+		boolean flag = true;
+		while (flag) {
 			strAction = scan.next();
 			if (strAction != null) {
 				switch (strAction) {
@@ -61,23 +73,64 @@ public class GameCycle {
 								"delete - to delete an old Tower\n" +
 								"skip - to skip the turn\n" +
 								"stop - to stop the game\n");
+						flag = false;
 						break;
 					case ("stop") :
 						System.exit(0);
 						break;
 					case ("add") :
-						//new method to add a Tower
+						towerAdd(scan, map, lstTowers, lstEnemies);
+						flag = false;
 						break;
 					case ("delete") :
 						//new method to delete a Tower
+						flag = false;
 						break;
-					case ("skip") :
-						break loop;
+					case ("skip"):
+						flag = false;
+						break;
 					default:
 						System.out.println("Unknown action. Try again.");
 				}
 			}
 		}
+	}
+
+	private static void towerAdd(Scanner scan, char[][] map, HashMap<Long, Tower> lstTowers, HashMap<Long, Enemy> lstEnemies) {
+		String[] tmp = new String[2];
+		int x, y, n = map.length, m = map[0].length;
+		System.out.println("Please input 0<=x<" + m + " and 0<=y<" + n +
+				". The coordinates of tower. The numbers have to be integers.");
+		while (true) {
+			try {
+				tmp[0] = scan.next();
+				tmp[1] = scan.next();
+				x = Integer.parseInt(tmp[0]);
+				y = Integer.parseInt(tmp[1]);
+				if (x < 0 || y < 0 || y >= n || x > m) {
+					System.out.println("Range error");
+					continue;
+				}
+				else {
+					long a = coordHash(x,y);
+					if (!lstTowers.containsKey(a) || !lstEnemies.containsKey(a)) {
+						lstTowers.put(a,new Tower(x,y));
+						map[x][y] = Tower.graphic;
+					}
+					else {
+						System.out.println("Tower already exists or there is the enemy!");
+						continue;
+					}
+				}
+				break;
+			} catch (InputMismatchException | NumberFormatException | OutOfMemoryError e) {
+				System.out.println("Error. Wrong format of input data. Try again.");
+			}
+		}
+	}
+
+	static long coordHash(int x, int y) {
+		return x | ((long)y << 32);
 	}
 
 }

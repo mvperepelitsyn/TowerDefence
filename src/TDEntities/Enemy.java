@@ -1,14 +1,14 @@
 package TDEntities;
 
 public class Enemy extends GameEntity {
-	private int			healthPoints;
-	private int			dmgPoints;
-	private int			speed;
-	private int			xCoord;
-	private int			yCoord;
-	private int 		rangeOfAttack;
-	final static int	id = 2;
-	public final char 	graphic = 'E';
+	private int					healthPoints;
+	private int					dmgPoints;
+	private int					speed;
+	private int					xCoord;
+	private int					yCoord;
+	private int 				rangeOfAttack;
+	public final static int		id = 2;
+	public final char 			graphic = 'E';
 
 	public Enemy(int healthPoints, int dmgPoints, int speed, int xCoord, int yCoord, int rangeOfAttack) {
 		this.healthPoints = healthPoints;
