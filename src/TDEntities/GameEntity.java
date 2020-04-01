@@ -1,12 +1,6 @@
 package TDEntities;
 
-abstract class GameEntity {
-	private int			healthPoints;
-	private int			dmgPoints;
-	private int			speed;
-	private int			xCoord;
-	private int			yCoord;
-	private int 		rangeOfAttack;
+public abstract class GameEntity {
 	static int			id = 0;
 
 	abstract public int getRangeOfAttack();
@@ -27,6 +21,11 @@ abstract class GameEntity {
 
 	abstract public void setyCoord(int yCoord);
 
-	abstract public int distance(GameEntity entity);
-
+	public int distance(GameEntity tower) {
+		if (getyCoord() == tower.getyCoord()) {
+			return Math.abs(getxCoord() - tower.getxCoord());
+		} else {
+			return -1;
+		}
+	}
 }
