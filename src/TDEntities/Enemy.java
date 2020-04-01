@@ -1,20 +1,23 @@
 package TDEntities;
 
 public class Enemy extends GameEntity {
-	private int			healthPoints = 100;
-	private int			dmgPoints = 1;
-	private int			speed = 1;
+	private int			healthPoints;
+	private int			dmgPoints;
+	private int			speed;
 	private int			xCoord;
 	private int			yCoord;
-	private int 		rangeOfAttack = 1;
-	static int			id = 2;
+	private int 		rangeOfAttack;
+	final static int	id = 2;
+	public final char 	graphic = 'E';
 
-	public Enemy(int xCoord, int yCoord) {
+	public Enemy(int healthPoints, int dmgPoints, int speed, int xCoord, int yCoord, int rangeOfAttack) {
+		this.healthPoints = healthPoints;
+		this.dmgPoints = dmgPoints;
+		this.speed = speed;
 		this.xCoord = xCoord;
 		this.yCoord = yCoord;
+		this.rangeOfAttack = rangeOfAttack;
 	}
-
-
 
 	@Override
 	public int getRangeOfAttack() {
@@ -59,15 +62,5 @@ public class Enemy extends GameEntity {
 	@Override
 	public void setyCoord(int yCoord) {
 		this.yCoord = yCoord;
-	}
-
-	@Override
-	public int distance(GameEntity tower) {
-		if (getyCoord() == tower.getyCoord()) {
-			return Math.abs(getxCoord() - tower.getxCoord());
-
-		} else {
-			return -1;
-		}
 	}
 }
