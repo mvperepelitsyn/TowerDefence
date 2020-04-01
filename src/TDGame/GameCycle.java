@@ -14,10 +14,11 @@ public class GameCycle {
 		for (int i = 0; i < map.length; i++) {
 			Arrays.fill(map[i],'*');
 		}
-		HashMap<Long, Tower> towers = new HashMap<Long, Tower>();
-		HashMap<Long, Enemy> enemies = new HashMap<Long, Enemy>();
+		LinkedHashMap<Long, Tower> towers = new LinkedHashMap<Long, Tower>();
+		LinkedHashMap<Long, Enemy> enemies = new LinkedHashMap<Long, Enemy>();
 		while (true) {
 			action(scan, towers, enemies, map);
+			Update.updateMap(towers, enemies, map);
 			addEnemy(towers, enemies, map);
 			showMap(map);
 		}
@@ -167,12 +168,12 @@ public class GameCycle {
 
 
 	static void addEnemy(HashMap<Long, Tower> towers, HashMap<Long, Enemy> enemies, char[][] map) {
-		int rows = map.length, count = rows / 5, rndRow;
+		int rows = map[0].length, count = rows / 5, rndRow;
 		long a;
 		Random rnd = new Random();
 		for (int i = 0; i < count; i++) {
 			rndRow = rnd.nextInt(rows);
-			a = coordHash(rndRow, map[0].length - 1);
+			a = coordHash(map.length - 1, rndRow);
 			if (!(towers.containsKey(a) || enemies.containsKey(a))) {
 				enemies.put(a, new Enemy(rnd.nextInt(100) + 1, rnd.nextInt(100) + 1,
 						rnd.nextInt((map[0].length - 1) / 3) + 1, rndRow, map[0].length - 1,
