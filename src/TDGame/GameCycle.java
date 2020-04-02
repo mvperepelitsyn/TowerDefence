@@ -7,6 +7,8 @@ import java.util.*;
 
 public class GameCycle {
 
+	static int iterForEnemies;
+
 	public static void gameCycle() {
 		Scanner scan = new Scanner(System.in);
 		char[][] map = getMap(scan);
@@ -45,6 +47,8 @@ public class GameCycle {
 				tmp[1] = scan.next();
 				n = Integer.parseInt(tmp[0]);
 				m = Integer.parseInt(tmp[1]);
+				iterForEnemies = n * m / 2;
+
 				if (n <= 0 || m <= 0) {
 					System.out.println("One of the numbers is zero or less than zero. Make it greater than zero.");
 					continue;
@@ -168,7 +172,7 @@ public class GameCycle {
 
 
 	static void addEnemy(HashMap<Long, Tower> towers, HashMap<Long, Enemy> enemies, char[][] map) {
-		int rows = map[0].length, count = rows / 5, rndRow;
+		int rows = map[0].length, count = (rows / 5 == 0) ? 1 : rows / 5, rndRow;
 		long a;
 		Random rnd = new Random();
 		for (int i = 0; i < count; i++) {
@@ -179,6 +183,7 @@ public class GameCycle {
 						rnd.nextInt((map[0].length - 1) / 3) + 1, rndRow, map[0].length - 1,
 						rnd.nextInt((map[0].length - 1) / 3) + 1));
 				map[rndRow][map[0].length - 1] = Enemy.graphic;
+				iterForEnemies--;
 			}
 		}
 	}
