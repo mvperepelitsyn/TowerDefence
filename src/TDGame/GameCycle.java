@@ -7,6 +7,8 @@ import java.util.*;
 
 public class GameCycle {
 
+	static int iterForEnemies;
+
 	public static void gameCycle() {
 		Scanner scan = new Scanner(System.in);
 		char[][] map = getMap(scan);
@@ -90,6 +92,7 @@ public class GameCycle {
 					}
 					//enemy killed
 					if (tmp_enemy.getHealthPoints() <= 0) {
+						iterForEnemies--;
 						it_e.remove();
 						map[y_en][x_en] = '*';
 						continue enemy;
@@ -168,6 +171,8 @@ public class GameCycle {
 				tmp[1] = scan.next();
 				n = Integer.parseInt(tmp[0]);
 				m = Integer.parseInt(tmp[1]);
+				iterForEnemies = ((n * m) / 2 > 0) ? (n * m) / 2 : 3;
+
 				if (n <= 0 || m <= 0) {
 					System.out.println("One of the numbers is zero or less than zero. Make it greater than zero.");
 					continue;
@@ -227,7 +232,7 @@ public class GameCycle {
 				tmp[1] = scan.next();
 				x = Integer.parseInt(tmp[0]);
 				y = Integer.parseInt(tmp[1]);
-				if (x < 0 || y < 0 || y >= n || x >= m) {
+				if (x < 0 || y < 0 || y >= n || x >= m - 1) {
 					System.out.println("The coordinates are out of reach. Try again:");
 					continue;
 				}
@@ -290,13 +295,13 @@ public class GameCycle {
 	}
 
 	static void addEnemy(HashMap<Long, Tower> towers, HashMap<Long, Enemy> enemies, char[][] map) {
-		int rows = map.length, count = rows / 5, rndRow;
+		int rndRow, count = (map.length / 3 > 0) ? map.length / 3 : 1;
 		long a;
 		Random rnd = new Random();
 		for (int i = 0; i < count; i++) {
-			rndRow = rnd.nextInt(rows);
-			a = coordHash(map[0].length - 1,rndRow);
-			if (!(towers.containsKey(a) || enemies.containsKey(a))) {
+			rndRow = rnd.nextInt(map.length);
+			a = coordHash(map[0].length - 1, rndRow);
+			if ((!(towers.containsKey(a) || enemies.containsKey(a))) && iterForEnemies > 0) {
 				enemies.put(a, new Enemy(rnd.nextInt(100) + 1, rnd.nextInt(100) + 1,
 						rnd.nextInt((map[0].length - 1) / 3) + 1, map[0].length - 1, rndRow,
 						rnd.nextInt((map[0].length - 1) / 3) + 1));
