@@ -7,7 +7,7 @@ public class RegularTower extends Tower {
 
 	public RegularTower(int xCoord, int yCoord) {
 		super(xCoord, yCoord);
-		dmgPoints = 50;
+		dmgPoints = 25;
 		healthPoints = 100;
 		rangeOfAttack = 3;
 	}

@@ -24,34 +24,40 @@ public class GameCycle {
 		HashMap<Long, Tower> towers = new LinkedHashMap<Long, Tower>();
 		HashMap<Long, Enemy> enemies = new LinkedHashMap<Long, Enemy>();
 		while (iterForEnemies + enemies.size() > 0) {
-			System.out.println("Tower points: "+ towerPoints);
+			System.out.println("Gold for tower: "+ towerPoints);
 			System.out.println("Towers can be added on field: "+ (numberOfTowersSimultaniously - towers.size()));
 			System.out.println("Enemy left: "+ (iterForEnemies + enemies.size()));
+			//player input
 			action(scan, towers, enemies, map);
-
-			for (Map.Entry<Long, Tower> entry : towers.entrySet()) {
-				Tower tmp = entry.getValue();
-				System.out.println("x: " + tmp.getxCoord() + " y: " + tmp.getyCoord() + " h: " +
-						tmp.getHealthPoints() + " d: " + tmp.getDmgPoints() + " s: " + tmp.getSpeed() +
-						" r: " + tmp.getRangeOfAttack());
-			}
-
-			showMap(map);
-			System.out.println();
+			//towers and enemy fight
 			doTurn(towers,enemies,map);
+			//generate new enemy
 			addEnemy(towers, enemies, map);
-
-			for (Map.Entry<Long, Enemy> entry : enemies.entrySet()) {
-				Enemy tmp = entry.getValue();
-				System.out.println("x: " + tmp.getxCoord() + " y: " + tmp.getyCoord() + " h: " +
-						tmp.getHealthPoints() + " d: " + tmp.getDmgPoints() + " s: " + tmp.getSpeed() +
-						" r: " + tmp.getRangeOfAttack());
-			}
-
+			//show map after turn
 			showMap(map);
+			//show lists of the tower and enemy which placed on the map
+			showLists(towers, enemies);
 			System.out.println();
+			towerPoints++;
 		}
 		System.out.println("Congratulations! You win!");
+	}
+
+	private static void showLists(HashMap<Long, Tower> towers, HashMap<Long, Enemy> enemies) {
+		System.out.println("Tower list: ");
+		for (Map.Entry<Long, Tower> entry : towers.entrySet()) {
+			Tower tmp = entry.getValue();
+			System.out.println("x: " + tmp.getxCoord() + " y: " + tmp.getyCoord() + " h: " +
+					tmp.getHealthPoints() + " d: " + tmp.getDmgPoints() + " s: " + tmp.getSpeed() +
+					" r: " + tmp.getRangeOfAttack());
+		}
+		System.out.println("Enemy list: ");
+		for (Map.Entry<Long, Enemy> entry : enemies.entrySet()) {
+			Enemy tmp = entry.getValue();
+			System.out.println("x: " + tmp.getxCoord() + " y: " + tmp.getyCoord() + " h: " +
+					tmp.getHealthPoints() + " d: " + tmp.getDmgPoints() + " s: " + tmp.getSpeed() +
+					" r: " + tmp.getRangeOfAttack());
+		}
 	}
 
 	private static void doTurn(HashMap<Long, Tower> towers,
@@ -239,6 +245,8 @@ public class GameCycle {
 		int x, y, n = map.length, m = map[0].length;
 		System.out.println("Please input the type of Tower \"strong\" or \"regular\" and the coordinates 0<=x<" + (m-1) + " and 0<=y<" + n +
 				". The numbers have to be integers.");
+		System.out.println("Strong Tower characteristics: cost = 6, health = 150, damage = 70, attack range = 5");
+		System.out.println("Regular Tower characteristics: cost = 3, health = 100, damage = 25, attack range = 3");
 		while (true) {
 			try {
 				tmp[0] = scan.next();
@@ -302,10 +310,10 @@ public class GameCycle {
 						long a = coordHash(x, y);
 						if (towers.containsKey(a)) {
 							if (towers.get(a) instanceof StrongTower) {
-								towerPoints+=StrongTower.cost;
+								towerPoints+=StrongTower.cost/2;
 							}
 							else if (towers.get(a) instanceof RegularTower) {
-								towerPoints+=RegularTower.cost;
+								towerPoints+=RegularTower.cost/2;
 							}
 							towers.remove(a);
 							map[y][x] = '*';
