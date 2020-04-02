@@ -19,7 +19,7 @@ public class GameCycle {
 		//we use linked to get correct iteration through enemies and towers
 		HashMap<Long, Tower> towers = new LinkedHashMap<Long, Tower>();
 		HashMap<Long, Enemy> enemies = new LinkedHashMap<Long, Enemy>();
-		while (true) {
+		while (iterForEnemies>0 || enemies.size() > 0) {
 			action(scan, towers, enemies, map);
 
 			for (Map.Entry<Long, Tower> entry : towers.entrySet()) {
@@ -135,11 +135,10 @@ public class GameCycle {
 			//if distance == 1 so we have a barrier and don't move
 			if (distance > 1) {
 				it_e.remove();
-				new_enemies.put(coordHash(x_en, y_en), tmp_enemy);
-
 				//if x > 0 than we don't lose. lose otherwise (because we can't create new tower)
 				if (x_en > 0) {
 					map[y_en][x_en] = 'E';
+					new_enemies.put(coordHash(x_en, y_en), tmp_enemy);
 				} else {
 					System.out.println("You were killed by enemy on y = " + y_en);
 					System.exit(0);
@@ -173,11 +172,11 @@ public class GameCycle {
 				m = Integer.parseInt(tmp[1]);
 				iterForEnemies = ((n * m) / 2 > 0) ? (n * m) / 2 : 3;
 
-				if (n <= 0 || m <= 0) {
-					System.out.println("One of the numbers is zero or less than zero. Make it greater than zero.");
+				if (n <= 0 || m <= 1) {
+					System.out.println("N is less than 1 or M less than 2. Make it greater.");
 					continue;
 				} else if ((long)n * m > 2147483647) {
-					System.out.println("The numbers are too big for a map. Make them smaller.");
+					System.out.println("The numbers are too big for a map (n * m > 2147483647. Make them smaller.");
 					continue;
 				}
 				break;
@@ -224,7 +223,7 @@ public class GameCycle {
 							HashMap<Long, Enemy> lstEnemies, char[][] map) {
 		String[] tmp = new String[2];
 		int x = 0, y = 0, n = map.length, m = map[0].length;
-		System.out.println("Please input 0<=x<" + m + " and 0<=y<" + n +
+		System.out.println("Please input 0<=x<" + (m-1) + " and 0<=y<" + n +
 				". The coordinates of tower. The numbers have to be integers.");
 		while (true) {
 			try {
@@ -258,7 +257,7 @@ public class GameCycle {
 		int x = 0, y = 0, n = map.length, m = map[0].length;;
 		String[] tmp = new String[2];
 		if (!towers.isEmpty()) {
-			System.out.println("Please input 0<=x<" + m + " and 0<=y<" + n +
+			System.out.println("Please input 0<=x<" + (m-1) + " and 0<=y<" + n +
 					". The coordinates of tower. The numbers have to be integers.");
 			while (true) {
 				try {
@@ -266,7 +265,7 @@ public class GameCycle {
 					tmp[1] = scan.next();
 					x = Integer.parseInt(tmp[0]);
 					y = Integer.parseInt(tmp[1]);
-					if (x >= n || y >= m || x < 0 || y < 0) {
+					if (x >= m - 1  || y >= n || x < 0 || y < 0) {
 						System.out.println("The coordinates are out of reach. Try again:");
 						continue;
 					} else {
@@ -303,8 +302,8 @@ public class GameCycle {
 			a = coordHash(map[0].length - 1, rndRow);
 			if ((!(towers.containsKey(a) || enemies.containsKey(a))) && iterForEnemies > 0) {
 				enemies.put(a, new Enemy(rnd.nextInt(100) + 1, rnd.nextInt(100) + 1,
-						rnd.nextInt((map[0].length - 1) / 3) + 1, map[0].length - 1, rndRow,
-						rnd.nextInt((map[0].length - 1) / 3) + 1));
+						rnd.nextInt(4) + 1, map[0].length - 1, rndRow,
+						rnd.nextInt(3) + 1));
 				map[rndRow][map[0].length - 1] = Enemy.graphic;
 			}
 		}
