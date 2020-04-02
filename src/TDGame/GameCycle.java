@@ -8,6 +8,8 @@ import java.util.*;
 public class GameCycle {
 
 	static int iterForEnemies;
+	static int iterForTowers;
+	static int numberOfTowersSimultaniously;
 
 	public static void gameCycle() {
 		Scanner scan = new Scanner(System.in);
@@ -171,6 +173,8 @@ public class GameCycle {
 				n = Integer.parseInt(tmp[0]);
 				m = Integer.parseInt(tmp[1]);
 				iterForEnemies = ((n * m) / 2 > 0) ? (n * m) / 2 : 3;
+				iterForTowers = (iterForEnemies / 2 > 0) ? iterForEnemies / 2 : 2;
+				numberOfTowersSimultaniously = (n / 1.5 > 0) ? (int)(n / 1.5) : 1;
 
 				if (n <= 0 || m <= 1) {
 					System.out.println("N is less than 1 or M less than 2. Make it greater.");
@@ -205,7 +209,12 @@ public class GameCycle {
 					case ("stop") :
 						System.exit(0);
 					case ("add") :
-						addNewTower(scan, lstTowers, lstEnemies, map);
+						if (iterForTowers > 0 && lstTowers.size() <= numberOfTowersSimultaniously) {
+							addNewTower(scan, lstTowers, lstEnemies, map);
+							iterForTowers--;
+						} else {
+							System.out.println("Oops! You can't add more Towers.\nThere are too many Towers on the map or you're run out of Towers.");
+						}
 						break loop;
 					case ("delete") :
 						deleteTower(scan, lstTowers, map);
