@@ -177,11 +177,11 @@ public class GameCycle {
 	static char[][] getMap(Scanner scan) {
 		int n = 0, m = 0;
 		String		tmpStr;
-		String[]	tmp = new String[2];
+		String[]	tmp;
 		System.out.println("Please input n and m. The size of the map. The numbers have to be integers.");
 		while (true) {
 			try {
-				tmpStr = scan.nextLine();
+				tmpStr = scan.nextLine().trim();
 				tmp = tmpStr.split(" ");
 				n = Integer.parseInt(tmp[0]);
 				m = Integer.parseInt(tmp[1]);
@@ -189,15 +189,18 @@ public class GameCycle {
 				towerPoints = (iterForEnemies / 2 > 0) ? iterForEnemies / 2 : 2;
 				numberOfTowersSimultaniously = (n / 1.5 > 0) ? (int)(n / 1.5) : 1;
 
-				if (n <= 0 || m <= 1) {
+				if (tmp.length > 2) {
+					System.out.println("Wrong format of input data. Try again.");
+					continue;
+				} else if (n <= 0 || m <= 1) {
 					System.out.println("N is less than 1 or M less than 2. Make it greater.");
 					continue;
 				} else if ((long)n * m > 2147483647) {
-					System.out.println("The numbers are too big for a map (n * m > 2147483647. Make them smaller.");
+					System.out.println("The numbers are too big for a map (n * m > 2147483647). Make them smaller.");
 					continue;
 				}
 				break;
-			} catch (InputMismatchException | NumberFormatException | OutOfMemoryError e) {
+			} catch (InputMismatchException | NumberFormatException | OutOfMemoryError | ArrayIndexOutOfBoundsException e) {
 				System.out.println("Error. Wrong format of input data. Try again.");
 			}
 		}
@@ -210,7 +213,7 @@ public class GameCycle {
 				"if you don't know the actions.");
 		String strAction;
 		loop : while (true) {
-			strAction = scan.nextLine();
+			strAction = scan.nextLine().trim();
 			if (strAction != null) {
 				switch (strAction) {
 					case ("usage") :
@@ -243,7 +246,7 @@ public class GameCycle {
 	static void addNewTower(Scanner scan, HashMap<Long, Tower> lstTowers,
 							HashMap<Long, Enemy> lstEnemies, char[][] map) {
 		String		tmpStr;
-		String[]	tmp = new String[3];
+		String[]	tmp;
 		int x, y, n = map.length, m = map[0].length;
 		System.out.println("Please input the type of Tower \"strong\" or \"regular\" and the coordinates 0<=x<" + (m-1) + " and 0<=y<" + n +
 				". The numbers have to be integers.\nIf you changed your mind and don't want to add a Tower or you don't have enough points then input \"skip\".");
@@ -251,10 +254,18 @@ public class GameCycle {
 		System.out.println("Regular Tower characteristics: cost = 3, health = 100, damage = 25, attack range = 3");
 		while (true) {
 			try {
-				tmpStr = scan.nextLine();
+				tmpStr = scan.nextLine().trim();
 				tmp = tmpStr.split(" ");
 				if (tmp[0].equals("skip")) {
-					break;
+					if (tmp.length == 1) {
+						break;
+					} else {
+						System.out.println("Wrong type of input data. Try again.");
+						continue;
+					}
+				} else if (tmp.length > 3) {
+					System.out.println("Wrong type of input data. Try again.");
+					continue;
 				}
 				x = Integer.parseInt(tmp[1]);
 				y = Integer.parseInt(tmp[2]);
@@ -297,7 +308,7 @@ public class GameCycle {
 
 	static void deleteTower(Scanner scan, HashMap<Long, Tower> towers, char[][] map) {
 		int x = 0, y = 0, n = map.length, m = map[0].length;;
-		String[]	tmp = new String[2];
+		String[]	tmp;
 		String		tmpStr;
 		if (!towers.isEmpty()) {
 			System.out.println("Please input 0<=x<" + (m-1) + " and 0<=y<" + n +
@@ -305,10 +316,18 @@ public class GameCycle {
 					"If you changed your mind and don't want to delete a Tower anymore then input \"skip\".");
 			while (true) {
 				try {
-					tmpStr = scan.nextLine();
+					tmpStr = scan.nextLine().trim();
 					tmp = tmpStr.split(" ");
 					if (tmp[0].equals("skip")) {
-						break;
+						if (tmp.length == 1) {
+							break;
+						} else {
+							System.out.println("Wrong format of input data. Try again.");
+							continue;
+						}
+					} else if (tmp.length > 2) {
+						System.out.println("Wrong format of input data. Try again.");
+						continue;
 					}
 					x = Integer.parseInt(tmp[0]);
 					y = Integer.parseInt(tmp[1]);
@@ -332,7 +351,7 @@ public class GameCycle {
 						}
 					}
 					break;
-				} catch (InputMismatchException | NumberFormatException | OutOfMemoryError e) {
+				} catch (InputMismatchException | NumberFormatException | OutOfMemoryError | ArrayIndexOutOfBoundsException e) {
 					System.out.println("Error. Wrong format of input data. Try again:");
 				}
 			}
