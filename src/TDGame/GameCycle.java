@@ -103,11 +103,9 @@ public class GameCycle {
 			}
 			//we reach this point if enemy is alive
 			//turn the enemy to the next position
-			map[y_en][x_en] = '*';
-			boolean flag = x_en - speed_enemy < 0;
 			int distance = map[0].length + 1; //more than can be
 			//we haven't towers or enemies on position x < 0
-			int low = (flag) ? 0 : x_en - speed_enemy;
+			int low = Math.max(x_en - speed_enemy, 0);
 
 			//check if the enemy can move with it speed (no barriers)
 			for (int i = x_en - 1; i >= low; i--) {
@@ -120,25 +118,29 @@ public class GameCycle {
 			//write new coordinate
 			//if enemy has barrier it moves close to it
 			if (speed_enemy < distance) {
+				map[y_en][x_en] = '*';
 				x_en = x_en - speed_enemy;
 				tmp_enemy.setxCoord(x_en);
 			}
-			else {
+			else if (distance > 1) {
+				map[y_en][x_en] = '*';
 				x_en = x_en - distance + 1;
 				tmp_enemy.setxCoord(x_en);
 			}
 
 			//we can't change a key, so we write it to a new collection
-			it_e.remove();
-			new_enemies.put(coordHash(x_en,y_en),tmp_enemy);
+			//if distance == 1 so we have a barrier and don't move
+			if (distance > 1) {
+				it_e.remove();
+				new_enemies.put(coordHash(x_en, y_en), tmp_enemy);
 
-			//if x > 0 than we don't lose. lose otherwise (because we can't create new tower)
-			if (x_en > 0) {
-				map[y_en][x_en] = 'E';
-			}
-			else {
-				System.out.println("RIP");
-				System.exit(0);
+				//if x > 0 than we don't lose. lose otherwise (because we can't create new tower)
+				if (x_en > 0) {
+					map[y_en][x_en] = 'E';
+				} else {
+					System.out.println("You were killed by enemy on y = " + y_en);
+					System.exit(0);
+				}
 			}
 		}
 		//rewrite our hashmap. now it has new enemies position
@@ -231,7 +233,7 @@ public class GameCycle {
 				}
 				else {
 					long a = coordHash(x,y);
-					if (!lstTowers.containsKey(a) || !lstEnemies.containsKey(a)) {
+					if (!lstTowers.containsKey(a) && !lstEnemies.containsKey(a)) {
 						lstTowers.put(a, new Tower(x,y));
 						map[y][x] = Tower.graphic;
 					}
