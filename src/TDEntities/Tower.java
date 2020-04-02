@@ -2,7 +2,7 @@ package TDEntities;
 
 public class Tower extends GameEntity {
 	private int					healthPoints = 1;
-	private final int			dmgPoints = 50;
+	private final int			dmgPoints = 1;
 	private final int			speed = 0;
 	private int					xCoord;
 	private int					yCoord;
@@ -14,10 +14,6 @@ public class Tower extends GameEntity {
 	public Tower(int xCoord, int yCoord) {
 		this.xCoord = xCoord;
 		this.yCoord = yCoord;
-	}
-
-	public static int getId() {
-		return id;
 	}
 
 	@Override
