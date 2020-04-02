@@ -21,7 +21,9 @@ public class GameCycle {
 		//we use linked to get correct iteration through enemies and towers
 		HashMap<Long, Tower> towers = new LinkedHashMap<Long, Tower>();
 		HashMap<Long, Enemy> enemies = new LinkedHashMap<Long, Enemy>();
-		while (iterForEnemies>0 || enemies.size() > 0) {
+		while (iterForEnemies + enemies.size() > 0) {
+			System.out.println("Tower allowed: "+ iterForTowers);
+			System.out.println("Enemy left: "+ (iterForEnemies + enemies.size()));
 			action(scan, towers, enemies, map);
 
 			for (Map.Entry<Long, Tower> entry : towers.entrySet()) {
@@ -46,6 +48,7 @@ public class GameCycle {
 			showMap(map);
 			System.out.println();
 		}
+		System.out.println("Congratulations! You win!");
 	}
 
 	private static void doTurn(HashMap<Long, Tower> towers,
@@ -94,7 +97,7 @@ public class GameCycle {
 					}
 					//enemy killed
 					if (tmp_enemy.getHealthPoints() <= 0) {
-						iterForEnemies--;
+						//iterForEnemies--;
 						it_e.remove();
 						map[y_en][x_en] = '*';
 						continue enemy;
@@ -309,11 +312,13 @@ public class GameCycle {
 		for (int i = 0; i < count; i++) {
 			rndRow = rnd.nextInt(map.length);
 			a = coordHash(map[0].length - 1, rndRow);
+			int b = ((map[0].length - 1) / 3) + 1;
 			if ((!(towers.containsKey(a) || enemies.containsKey(a))) && iterForEnemies > 0) {
 				enemies.put(a, new Enemy(rnd.nextInt(100) + 1, rnd.nextInt(100) + 1,
 						rnd.nextInt(4) + 1, map[0].length - 1, rndRow,
 						rnd.nextInt(3) + 1));
 				map[rndRow][map[0].length - 1] = Enemy.graphic;
+				iterForEnemies--;
 			}
 		}
 	}
