@@ -1,6 +1,7 @@
 package TDEntities;
 
 public class Tower extends GameEntity {
+
 	protected int				healthPoints = 1;
 	protected int				dmgPoints = 50;
 	protected final int			speed = 0;

@@ -176,12 +176,13 @@ public class GameCycle {
 
 	static char[][] getMap(Scanner scan) {
 		int n = 0, m = 0;
-		String[] tmp = new String[2];
+		String		tmpStr;
+		String[]	tmp = new String[2];
 		System.out.println("Please input n and m. The size of the map. The numbers have to be integers.");
 		while (true) {
 			try {
-				tmp[0] = scan.next();
-				tmp[1] = scan.next();
+				tmpStr = scan.nextLine();
+				tmp = tmpStr.split(" ");
 				n = Integer.parseInt(tmp[0]);
 				m = Integer.parseInt(tmp[1]);
 				iterForEnemies = ((n * m) / 2 > 0) ? (n * m) / 2 : 3;
@@ -209,7 +210,7 @@ public class GameCycle {
 				"if you don't know the actions.");
 		String strAction;
 		loop : while (true) {
-			strAction = scan.next();
+			strAction = scan.nextLine();
 			if (strAction != null) {
 				switch (strAction) {
 					case ("usage") :
@@ -241,17 +242,20 @@ public class GameCycle {
 
 	static void addNewTower(Scanner scan, HashMap<Long, Tower> lstTowers,
 							HashMap<Long, Enemy> lstEnemies, char[][] map) {
-		String[] tmp = new String[3];
+		String		tmpStr;
+		String[]	tmp = new String[3];
 		int x, y, n = map.length, m = map[0].length;
 		System.out.println("Please input the type of Tower \"strong\" or \"regular\" and the coordinates 0<=x<" + (m-1) + " and 0<=y<" + n +
-				". The numbers have to be integers.");
+				". The numbers have to be integers.\nIf you changed your mind and don't want to add a Tower or you don't have enough points then input \"skip\".");
 		System.out.println("Strong Tower characteristics: cost = 6, health = 150, damage = 70, attack range = 5");
 		System.out.println("Regular Tower characteristics: cost = 3, health = 100, damage = 25, attack range = 3");
 		while (true) {
 			try {
-				tmp[0] = scan.next();
-				tmp[1] = scan.next();
-				tmp[2] = scan.next();
+				tmpStr = scan.nextLine();
+				tmp = tmpStr.split(" ");
+				if (tmp[0].equals("skip")) {
+					break;
+				}
 				x = Integer.parseInt(tmp[1]);
 				y = Integer.parseInt(tmp[2]);
 				if (!(tmp[0].equals("regular") || tmp[0].equals("strong"))) {
@@ -275,7 +279,7 @@ public class GameCycle {
 							towerPoints -= StrongTower.cost;
 						}
 						else {
-							System.out.println("You have not enough points!");
+							System.out.println("You don't have enough points!");
 							continue;
 						}
 					}
@@ -285,7 +289,7 @@ public class GameCycle {
 					}
 				}
 				break;
-			} catch (InputMismatchException | NumberFormatException | OutOfMemoryError e) {
+			} catch (InputMismatchException | NumberFormatException | OutOfMemoryError | ArrayIndexOutOfBoundsException e) {
 				System.out.println("Error. Wrong format of input data. Try again.");
 			}
 		}
@@ -293,14 +297,19 @@ public class GameCycle {
 
 	static void deleteTower(Scanner scan, HashMap<Long, Tower> towers, char[][] map) {
 		int x = 0, y = 0, n = map.length, m = map[0].length;;
-		String[] tmp = new String[2];
+		String[]	tmp = new String[2];
+		String		tmpStr;
 		if (!towers.isEmpty()) {
 			System.out.println("Please input 0<=x<" + (m-1) + " and 0<=y<" + n +
-					". The coordinates of tower. The numbers have to be integers.");
+					". The coordinates of tower. The numbers have to be integers.\n" +
+					"If you changed your mind and don't want to delete a Tower anymore then input \"skip\".");
 			while (true) {
 				try {
-					tmp[0] = scan.next();
-					tmp[1] = scan.next();
+					tmpStr = scan.nextLine();
+					tmp = tmpStr.split(" ");
+					if (tmp[0].equals("skip")) {
+						break;
+					}
 					x = Integer.parseInt(tmp[0]);
 					y = Integer.parseInt(tmp[1]);
 					if (x >= m - 1  || y >= n || x < 0 || y < 0) {
