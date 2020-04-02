@@ -22,24 +22,24 @@ public class GameCycle {
 		while (true) {
 			action(scan, towers, enemies, map);
 
-			for (Map.Entry<Long, Tower> entry : towers.entrySet()) {
-				Tower tmp = entry.getValue();
-				System.out.println("x: " + tmp.getxCoord() + " y: " + tmp.getyCoord() + " h: " +
-						tmp.getHealthPoints() + " d: " + tmp.getDmgPoints() + " s: " + tmp.getSpeed() +
-						" r: " + tmp.getRangeOfAttack());
-			}
+//			for (Map.Entry<Long, Tower> entry : towers.entrySet()) {
+//				Tower tmp = entry.getValue();
+//				System.out.println("x: " + tmp.getxCoord() + " y: " + tmp.getyCoord() + " h: " +
+//						tmp.getHealthPoints() + " d: " + tmp.getDmgPoints() + " s: " + tmp.getSpeed() +
+//						" r: " + tmp.getRangeOfAttack());
+//			}
 
 			showMap(map);
 			System.out.println();
 			doTurn(towers, enemies, map);
 			addEnemy(towers, enemies, map);
 
-			for (Map.Entry<Long, Enemy> entry : enemies.entrySet()) {
-				Enemy tmp = entry.getValue();
-				System.out.println("x: " + tmp.getxCoord() + " y: " + tmp.getyCoord() + " h: " +
-						tmp.getHealthPoints() + " d: " + tmp.getDmgPoints() + " s: " + tmp.getSpeed() +
-						" r: " + tmp.getRangeOfAttack());
-			}
+//			for (Map.Entry<Long, Enemy> entry : enemies.entrySet()) {
+//				Enemy tmp = entry.getValue();
+//				System.out.println("x: " + tmp.getxCoord() + " y: " + tmp.getyCoord() + " h: " +
+//						tmp.getHealthPoints() + " d: " + tmp.getDmgPoints() + " s: " + tmp.getSpeed() +
+//						" r: " + tmp.getRangeOfAttack());
+//			}
 
 			showMap(map);
 			System.out.println();
@@ -169,7 +169,7 @@ public class GameCycle {
 				tmp[1] = scan.next();
 				n = Integer.parseInt(tmp[0]);
 				m = Integer.parseInt(tmp[1]);
-				iterForEnemies = n * m / 2;
+				iterForEnemies = ((n * m) / 2 > 0) ? (n * m) / 2 : 3;
 
 				if (n <= 0 || m <= 0) {
 					System.out.println("One of the numbers is zero or less than zero. Make it greater than zero.");
@@ -293,16 +293,18 @@ public class GameCycle {
 	}
 
 	static void addEnemy(HashMap<Long, Tower> towers, HashMap<Long, Enemy> enemies, char[][] map) {
-		int rndRow;
+		int rndRow, count = (map.length / 3 > 0) ? map.length / 3 : 1;
 		long a;
 		Random rnd = new Random();
-		rndRow = rnd.nextInt(map.length);
-		a = coordHash(rndRow , map[0].length - 1);
-		if ((!(towers.containsKey(a) || enemies.containsKey(a))) && iterForEnemies > 0) {
-			enemies.put(a, new Enemy(rnd.nextInt(100) + 1, rnd.nextInt(100) + 1,
-					rnd.nextInt((map[0].length - 1) / 3) + 1, map[0].length - 1, rndRow,
-					rnd.nextInt((map[0].length - 1) / 3) + 1));
-			map[rndRow][map[0].length - 1] = Enemy.graphic;
+		for (int i = 0; i < count; i++) {
+			rndRow = rnd.nextInt(map.length);
+			a = coordHash(rndRow, map[0].length - 1);
+			if ((!(towers.containsKey(a) || enemies.containsKey(a))) && iterForEnemies > 0) {
+				enemies.put(a, new Enemy(rnd.nextInt(100) + 1, rnd.nextInt(100) + 1,
+						rnd.nextInt((map[0].length - 1) / 3) + 1, map[0].length - 1, rndRow,
+						rnd.nextInt((map[0].length - 1) / 3) + 1));
+				map[rndRow][map[0].length - 1] = Enemy.graphic;
+			}
 		}
 	}
 }
