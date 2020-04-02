@@ -126,7 +126,7 @@ public class GameCycle {
 
 			//check if the enemy can move with it speed (no barriers)
 			for (int i = x_en - 1; i >= low; i--) {
-				if (map[y_en][i] == 'T' || map[y_en][i] == 'E') {
+				if (map[y_en][i] == 'T' || map[y_en][i] == 'E' || map[y_en][i] == 't') {
 					distance = x_en - i;
 					break;
 				}
@@ -186,8 +186,10 @@ public class GameCycle {
 				n = Integer.parseInt(tmp[0]);
 				m = Integer.parseInt(tmp[1]);
 				iterForEnemies = ((n * m) / 2 > 0) ? (n * m) / 2 : 3;
-				towerPoints = (iterForEnemies / 2 > 0) ? iterForEnemies / 2 : 2;
-				numberOfTowersSimultaniously = (n / 1.5 > 0) ? (int)(n / 1.5) : 1;
+				//towerPoints = (iterForEnemies / 2 > 0) ? iterForEnemies / 2 : 2;
+				towerPoints = (int) (Math.sqrt(iterForEnemies) * 2);
+				//numberOfTowersSimultaniously = (n / 1.5 > 0) ? (int)(n / 1.5) : 1;
+				numberOfTowersSimultaniously = (int) (n*1.2);
 
 				if (tmp.length > 2) {
 					System.out.println("Wrong format of input data. Try again.");
@@ -307,7 +309,7 @@ public class GameCycle {
 	}
 
 	static void deleteTower(Scanner scan, HashMap<Long, Tower> towers, char[][] map) {
-		int x = 0, y = 0, n = map.length, m = map[0].length;;
+		int x, y, n = map.length, m = map[0].length;
 		String[]	tmp;
 		String		tmpStr;
 		if (!towers.isEmpty()) {
