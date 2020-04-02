@@ -8,6 +8,7 @@ import java.util.*;
 public class GameCycle {
 
 	static int iterForEnemies;
+	static int iterForTowers;
 
 	public static void gameCycle() {
 		Scanner scan = new Scanner(System.in);
@@ -172,6 +173,7 @@ public class GameCycle {
 				n = Integer.parseInt(tmp[0]);
 				m = Integer.parseInt(tmp[1]);
 				iterForEnemies = ((n * m) / 2 > 0) ? (n * m) / 2 : 3;
+				iterForTowers = (n / 1.5 > 0) ? (int)(n / 1.5) : 3;
 
 				if (n <= 0 || m <= 0) {
 					System.out.println("One of the numbers is zero or less than zero. Make it greater than zero.");
