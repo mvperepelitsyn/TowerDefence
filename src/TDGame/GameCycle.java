@@ -16,14 +16,109 @@ public class GameCycle {
 		for (int i = 0; i < map.length; i++) {
 			Arrays.fill(map[i],'*');
 		}
-		LinkedHashMap<Long, Tower> towers = new LinkedHashMap<Long, Tower>();
-		LinkedHashMap<Long, Enemy> enemies = new LinkedHashMap<Long, Enemy>();
+		HashMap<Long, Tower> towers = new LinkedHashMap<Long, Tower>();
+		HashMap<Long, Enemy> enemies = new LinkedHashMap<Long, Enemy>();
 		while (true) {
 			action(scan, towers, enemies, map);
+			showMap(map);
 			Update.updateMap(towers, enemies, map);
 			addEnemy(towers, enemies, map);
+			System.out.println();
+//		while (true) {
+//			action(scan, towers, enemies, map);
+//			for (Map.Entry<Long, Tower> entry : towers.entrySet()) {
+//				Tower tmp = entry.getValue();
+//				System.out.println("x: " + tmp.getxCoord() + " y: " + tmp.getyCoord() + " h: " +
+//						tmp.getHealthPoints() + " d: " + tmp.getDmgPoints() + " s: " + tmp.getSpeed() +
+//						" r: " + tmp.getRangeOfAttack());
+//			}
+//			showMap(map);
+//			System.out.println();
+//			doTurn(towers,enemies,map);
+//			addEnemy(towers, enemies, map);
+//			for (Map.Entry<Long, Enemy> entry : enemies.entrySet()) {
+//				Enemy tmp = entry.getValue();
+//				System.out.println("x: " + tmp.getxCoord() + " y: " + tmp.getyCoord() + " h: " +
+//						tmp.getHealthPoints() + " d: " + tmp.getDmgPoints() + " s: " + tmp.getSpeed() +
+//						" r: " + tmp.getRangeOfAttack());
+//			}
 			showMap(map);
+			System.out.println();
 		}
+	}
+
+	private static void doTurn(HashMap<Long, Tower> towers,
+							   HashMap<Long, Enemy> enemies, char[][] map) {
+
+		HashMap<Long, Enemy> new_enemies = new LinkedHashMap<>();
+
+		/* turn */
+		Iterator it_e = enemies.entrySet().iterator();
+
+		enemy: while (it_e.hasNext()) {
+			Map.Entry pair_enemy = (Map.Entry)it_e.next();
+			Enemy tmp_enemy = (Enemy) pair_enemy.getValue();
+			Iterator it_t = towers.entrySet().iterator();
+			int x_en = tmp_enemy.getxCoord();
+			int y_en = tmp_enemy.getyCoord();
+			int speed_enemy = tmp_enemy.getSpeed();
+			while (it_t.hasNext()) {
+				Map.Entry pair_tower = (Map.Entry)it_t.next();
+				Tower tmp_tower = (Tower) pair_tower.getValue();
+				int x_t = tmp_tower.getxCoord();
+				int y_t = tmp_tower.getyCoord();
+
+				//tower atack if it is close
+				int distance = tmp_tower.distance(tmp_enemy);
+				int range_tower = tmp_tower.getRangeOfAttack();
+				int range_enemy = tmp_enemy.getRangeOfAttack();
+				if (distance <= range_tower && distance != -1) {
+					tmp_enemy.setHealthPoints(tmp_enemy.getHealthPoints() - tmp_tower.getDmgPoints());
+				}
+				if (distance <= range_enemy && distance != -1) {
+					tmp_tower.setHealthPoints(tmp_tower.getHealthPoints() - tmp_enemy.getDmgPoints());
+				}
+				if (tmp_enemy.getHealthPoints() <= 0) {
+					it_e.remove();
+					map[y_en][x_en] = '*';
+					continue enemy;
+				}
+				if (tmp_tower.getHealthPoints() <= 0) {
+					it_t.remove();
+					map[y_t][x_t] = '*';
+				}
+			}
+			//turn based
+			map[y_en][x_en] = '*';
+			boolean flag = x_en - speed_enemy < 0;
+			int distance = map[0].length + 1; //more than can be
+			int low = (flag) ? 0 : x_en - speed_enemy;
+			for (int i = x_en - 1; i >= low; i--) {
+				if (map[y_en][i] == 'T' || map[y_en][i] == 'E') {
+					distance = x_en - i;
+					break;
+				}
+			}
+
+			if (speed_enemy < distance) {
+				x_en = x_en - speed_enemy;
+				tmp_enemy.setxCoord(x_en);
+			}
+			else {
+				x_en = x_en - distance + 1;
+				tmp_enemy.setxCoord(x_en);
+			}
+			it_e.remove();
+			new_enemies.put(coordHash(x_en,y_en),tmp_enemy);
+			if (x_en > 0) {
+				map[y_en][x_en] = 'E';
+			}
+			else {
+				System.out.println("RIP");
+				System.exit(0);
+			}
+		}
+		enemies.putAll(new_enemies);
 	}
 
 	private static void showMap(char[][] map) {
@@ -108,15 +203,15 @@ public class GameCycle {
 				tmp[1] = scan.next();
 				x = Integer.parseInt(tmp[0]);
 				y = Integer.parseInt(tmp[1]);
-				if (x < 0 || y < 0 || y >= n || x >= m) {
+				if (x < 0 || y < 0 || y >= m || x >= n) {
 					System.out.println("The coordinates are out of reach. Try again:");
 					continue;
 				}
 				else {
 					long a = coordHash(x,y);
 					if (!lstTowers.containsKey(a) || !lstEnemies.containsKey(a)) {
-						lstTowers.put(a, new Tower(x,y));
-						map[x][y] = Tower.graphic;
+						lstTowers.put(a, new Tower(x ,y));
+						map[x][y] = Tower.graphic; //here was y x and i changed it
 					}
 					else {
 						System.out.println("Tower already exists or there is the enemy!");
@@ -149,7 +244,7 @@ public class GameCycle {
 						long a = coordHash(x, y);
 						if (towers.containsKey(a)) {
 							towers.remove(a);
-							map[x][y] = '*';
+							map[y][x] = '*';
 						} else {
 							System.out.println("No such tower!");
 							continue;
@@ -172,19 +267,16 @@ public class GameCycle {
 
 
 	static void addEnemy(HashMap<Long, Tower> towers, HashMap<Long, Enemy> enemies, char[][] map) {
-		int rows = map[0].length, count = (rows / 5 == 0) ? 1 : rows / 5, rndRow;
+		int rndRow;
 		long a;
 		Random rnd = new Random();
-		for (int i = 0; i < count; i++) {
-			rndRow = rnd.nextInt(rows);
-			a = coordHash(map.length - 1, rndRow);
-			if (!(towers.containsKey(a) || enemies.containsKey(a))) {
-				enemies.put(a, new Enemy(rnd.nextInt(100) + 1, rnd.nextInt(100) + 1,
-						rnd.nextInt((map[0].length - 1) / 3) + 1, rndRow, map[0].length - 1,
-						rnd.nextInt((map[0].length - 1) / 3) + 1));
-				map[rndRow][map[0].length - 1] = Enemy.graphic;
-				iterForEnemies--;
-			}
+		rndRow = rnd.nextInt(map.length);
+		a = coordHash(rndRow , map[0].length - 1);
+		if (!(towers.containsKey(a) || enemies.containsKey(a))) {
+			enemies.put(a, new Enemy(rnd.nextInt(100) + 1, rnd.nextInt(100) + 1,
+					rnd.nextInt((map[0].length - 1) / 3) + 1, rndRow, map[0].length - 1,
+					rnd.nextInt((map[0].length - 1) / 3) + 1));
+			map[rndRow][map[0].length - 1] = Enemy.graphic;
 		}
 	}
 }

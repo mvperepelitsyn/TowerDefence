@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class Update {
 
-	static void towersShooting(LinkedHashMap<Long, Tower> towers, LinkedHashMap<Long, Enemy> enemies,
+	static void towersShooting(HashMap<Long, Tower> towers, HashMap<Long, Enemy> enemies,
 							   char[][] map) {
 		int leftZone = 0, rightZone = 0, max = 0;
 		long a;
@@ -18,9 +18,9 @@ public class Update {
 		for (Map.Entry<Long, Tower> tower : towers.entrySet()) {
 			tmpTower = tower.getValue();
 			leftZone = (tmpTower.getyCoord() - tmpTower.getRangeOfAttack() >= 0) ?
-					tmpTower.getRangeOfAttack() : tmpTower.getRangeOfAttack() - tmpTower.getyCoord();
-			rightZone = (tmpTower.getyCoord() + tmpTower.getRangeOfAttack() >= map.length) ?
-					map.length - 1 - tmpTower.getyCoord() : tmpTower.getRangeOfAttack();
+					tmpTower.getRangeOfAttack() : tmpTower.getyCoord();
+			rightZone = (tmpTower.getyCoord() + tmpTower.getRangeOfAttack() >= map[0].length) ?
+					map[0].length - 1 - tmpTower.getyCoord() : tmpTower.getRangeOfAttack();
 			for (int i = leftZone; i > 0; i--) {
 				if (map[tmpTower.getxCoord()][tmpTower.getyCoord() - leftZone] == 'E') {
 					a = GameCycle.coordHash(tmpTower.getxCoord(), tmpTower.getyCoord() - leftZone);
@@ -47,25 +47,55 @@ public class Update {
 		}
 	}
 
-	static void enemiesKickAndJump(LinkedHashMap<Long, Tower> towers, LinkedHashMap<Long, Enemy> enemies,
+	static void enemiesKickAndJump(HashMap<Long, Tower> towers, HashMap<Long, Enemy> enemies,
 							char[][] map) {
-		int leftZone = 0;
+		int leftZone = 0, lengthOfJump = 0;
 		long a;
 		Tower tmpTower;
 		Enemy tmpEnemy;
+		boolean wasAnAttack;
 		for (Map.Entry<Long, Enemy> enemyPair : enemies.entrySet()) {
+			wasAnAttack = false;
 			tmpEnemy = enemyPair.getValue();
 			leftZone = (tmpEnemy.getyCoord() - tmpEnemy.getRangeOfAttack() >= 0) ?
-					tmpEnemy.getRangeOfAttack() : tmpEnemy.getRangeOfAttack() - tmpEnemy.getyCoord();
+					tmpEnemy.getRangeOfAttack() : tmpEnemy.getyCoord();
 			for (int i = leftZone; i > 0; i--) {
-				//if (map[])
+				if (map[tmpEnemy.getxCoord()][tmpEnemy.getyCoord() - leftZone] == 'T') {
+					wasAnAttack = true;
+					a = GameCycle.coordHash(tmpEnemy.getxCoord(), tmpEnemy.getyCoord() - leftZone);
+					tmpTower = towers.get(a);
+					tmpTower.setHealthPoints(tmpTower.getHealthPoints() - tmpEnemy.getDmgPoints());
+					if (tmpTower.getHealthPoints() <= 0) {
+						towers.remove(a);
+						map[tmpTower.getxCoord()][tmpTower.getyCoord() - leftZone] = '*';
+					}
+				}
+			}
+			if (!wasAnAttack) {
+				for (int i = 1; i < tmpEnemy.getSpeed(); i++) {
+					if (map[tmpEnemy.getxCoord()][tmpEnemy.getyCoord() - i] != '*') {
+						wasAnAttack = true;
+						lengthOfJump = i - 1;
+					}
+				}
+				long a1 = GameCycle.coordHash(tmpEnemy.getxCoord(), tmpEnemy.getyCoord());
+				long a2 = GameCycle.coordHash(tmpEnemy.getyCoord(), tmpEnemy.getxCoord());
+				long a3 = enemyPair.getKey();
+				lengthOfJump = wasAnAttack ? lengthOfJump : tmpEnemy.getSpeed();
+				map[tmpEnemy.getxCoord()][tmpEnemy.getyCoord()] = '*';
+				map[tmpEnemy.getxCoord()][tmpEnemy.getyCoord() - lengthOfJump] = 'E';
+				a = GameCycle.coordHash(tmpEnemy.getxCoord(), tmpEnemy.getyCoord() - lengthOfJump);
+				if (a != enemyPair.getKey()) {
+					enemies.remove(enemyPair.getKey());
+					enemies.put(a, tmpEnemy);
+				}
 			}
 
 		}
 
 	}
 
-	static public void updateMap(LinkedHashMap<Long, Tower> towers, LinkedHashMap<Long, Enemy> enemies,
+	static public void updateMap(HashMap<Long, Tower> towers, HashMap<Long, Enemy> enemies,
 								 char[][] map) {
 		towersShooting(towers, enemies, map);
 		enemiesKickAndJump(towers, enemies, map);
