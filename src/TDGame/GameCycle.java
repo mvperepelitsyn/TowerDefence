@@ -14,26 +14,31 @@ public class GameCycle {
 		for (int i = 0; i < map.length; i++) {
 			Arrays.fill(map[i],'*');
 		}
+		//we use linked to get correct iteration through enemies and towers
 		HashMap<Long, Tower> towers = new LinkedHashMap<Long, Tower>();
 		HashMap<Long, Enemy> enemies = new LinkedHashMap<Long, Enemy>();
 		while (true) {
 			action(scan, towers, enemies, map);
+
 			for (Map.Entry<Long, Tower> entry : towers.entrySet()) {
 				Tower tmp = entry.getValue();
 				System.out.println("x: " + tmp.getxCoord() + " y: " + tmp.getyCoord() + " h: " +
 						tmp.getHealthPoints() + " d: " + tmp.getDmgPoints() + " s: " + tmp.getSpeed() +
 						" r: " + tmp.getRangeOfAttack());
 			}
+
 			showMap(map);
 			System.out.println();
 			doTurn(towers,enemies,map);
 			addEnemy(towers, enemies, map);
+
 			for (Map.Entry<Long, Enemy> entry : enemies.entrySet()) {
 				Enemy tmp = entry.getValue();
 				System.out.println("x: " + tmp.getxCoord() + " y: " + tmp.getyCoord() + " h: " +
 						tmp.getHealthPoints() + " d: " + tmp.getDmgPoints() + " s: " + tmp.getSpeed() +
 						" r: " + tmp.getRangeOfAttack());
 			}
+
 			showMap(map);
 			System.out.println();
 		}
@@ -46,45 +51,65 @@ public class GameCycle {
 
 		/* turn */
 		Iterator it_e = enemies.entrySet().iterator();
-
+		// iteration on each enemy
 		enemy: while (it_e.hasNext()) {
+			//get enemy
 			Map.Entry pair_enemy = (Map.Entry)it_e.next();
 			Enemy tmp_enemy = (Enemy) pair_enemy.getValue();
+
+			//iteration on each tower
 			Iterator it_t = towers.entrySet().iterator();
+			//coords of the enemy and speed
 			int x_en = tmp_enemy.getxCoord();
 			int y_en = tmp_enemy.getyCoord();
 			int speed_enemy = tmp_enemy.getSpeed();
+
+			//iteration through each tower
 			while (it_t.hasNext()) {
+				//get tower
 				Map.Entry pair_tower = (Map.Entry)it_t.next();
 				Tower tmp_tower = (Tower) pair_tower.getValue();
+				//coords of the tower (it is necessary for deleting)
 				int x_t = tmp_tower.getxCoord();
 				int y_t = tmp_tower.getyCoord();
 
-				//tower atack if it is close
+				//tower atack if enemy is close. get atack ranges enemy and tower
 				int distance = tmp_tower.distance(tmp_enemy);
 				int range_tower = tmp_tower.getRangeOfAttack();
 				int range_enemy = tmp_enemy.getRangeOfAttack();
-				if (distance <= range_tower && distance != -1) {
-					tmp_enemy.setHealthPoints(tmp_enemy.getHealthPoints() - tmp_tower.getDmgPoints());
-				}
-				if (distance <= range_enemy && distance != -1) {
-					tmp_tower.setHealthPoints(tmp_tower.getHealthPoints() - tmp_enemy.getDmgPoints());
-				}
-				if (tmp_enemy.getHealthPoints() <= 0) {
-					it_e.remove();
-					map[y_en][x_en] = '*';
-					continue enemy;
-				}
-				if (tmp_tower.getHealthPoints() <= 0) {
-					it_t.remove();
-					map[y_t][x_t] = '*';
+
+				//if distance == -1 => enemy and tower not on one line
+				if (distance != - 1) {
+					//tower attack
+					if (distance <= range_tower) {
+						tmp_enemy.setHealthPoints(tmp_enemy.getHealthPoints() - tmp_tower.getDmgPoints());
+					}
+					//enemy attack
+					if (distance <= range_enemy) {
+						tmp_tower.setHealthPoints(tmp_tower.getHealthPoints() - tmp_enemy.getDmgPoints());
+					}
+					//enemy killed
+					if (tmp_enemy.getHealthPoints() <= 0) {
+						it_e.remove();
+						map[y_en][x_en] = '*';
+						continue enemy;
+					}
+					//tower killed
+					if (tmp_tower.getHealthPoints() <= 0) {
+						it_t.remove();
+						map[y_t][x_t] = '*';
+					}
 				}
 			}
-			//turn based
+			//we reach this point if enemy is alive
+			//turn the enemy to the next position
 			map[y_en][x_en] = '*';
 			boolean flag = x_en - speed_enemy < 0;
 			int distance = map[0].length + 1; //more than can be
+			//we haven't towers or enemies on position x < 0
 			int low = (flag) ? 0 : x_en - speed_enemy;
+
+			//check if the enemy can move with it speed (no barriers)
 			for (int i = x_en - 1; i >= low; i--) {
 				if (map[y_en][i] == 'T' || map[y_en][i] == 'E') {
 					distance = x_en - i;
@@ -92,6 +117,8 @@ public class GameCycle {
 				}
 			}
 
+			//write new coordinate
+			//if enemy has barrier it moves close to it
 			if (speed_enemy < distance) {
 				x_en = x_en - speed_enemy;
 				tmp_enemy.setxCoord(x_en);
@@ -100,8 +127,12 @@ public class GameCycle {
 				x_en = x_en - distance + 1;
 				tmp_enemy.setxCoord(x_en);
 			}
+
+			//we can't change a key, so we write it to a new collection
 			it_e.remove();
 			new_enemies.put(coordHash(x_en,y_en),tmp_enemy);
+
+			//if x > 0 than we don't lose. lose otherwise (because we can't create new tower)
 			if (x_en > 0) {
 				map[y_en][x_en] = 'E';
 			}
@@ -110,6 +141,7 @@ public class GameCycle {
 				System.exit(0);
 			}
 		}
+		//rewrite our hashmap. now it has new enemies position
 		enemies.putAll(new_enemies);
 	}
 
@@ -254,7 +286,6 @@ public class GameCycle {
 	static long coordHash(int x, int y) {
 		return x | ((long)y << 32);
 	}
-
 
 	static void addEnemy(HashMap<Long, Tower> towers, HashMap<Long, Enemy> enemies, char[][] map) {
 		int rows = map.length, count = rows / 5, rndRow;
