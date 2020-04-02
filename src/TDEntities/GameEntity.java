@@ -1,7 +1,6 @@
 package TDEntities;
 
 public abstract class GameEntity {
-	static int			id = 0;
 
 	abstract public int getRangeOfAttack();
 

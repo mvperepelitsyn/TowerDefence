@@ -10,7 +10,7 @@ import java.util.*;
 public class GameCycle {
 
 	static int iterForEnemies;
-	static int iterForTowers;
+	static int towerPoints;
 	static int numberOfTowersSimultaniously;
 
 	public static void gameCycle() {
@@ -24,7 +24,8 @@ public class GameCycle {
 		HashMap<Long, Tower> towers = new LinkedHashMap<Long, Tower>();
 		HashMap<Long, Enemy> enemies = new LinkedHashMap<Long, Enemy>();
 		while (iterForEnemies + enemies.size() > 0) {
-			System.out.println("Tower allowed: "+ iterForTowers);
+			System.out.println("Tower points: "+ towerPoints);
+			System.out.println("Towers can be added on field: "+ (numberOfTowersSimultaniously - towers.size()));
 			System.out.println("Enemy left: "+ (iterForEnemies + enemies.size()));
 			action(scan, towers, enemies, map);
 
@@ -178,7 +179,7 @@ public class GameCycle {
 				n = Integer.parseInt(tmp[0]);
 				m = Integer.parseInt(tmp[1]);
 				iterForEnemies = ((n * m) / 2 > 0) ? (n * m) / 2 : 3;
-				iterForTowers = (iterForEnemies / 2 > 0) ? iterForEnemies / 2 : 2;
+				towerPoints = (iterForEnemies / 2 > 0) ? iterForEnemies / 2 : 2;
 				numberOfTowersSimultaniously = (n / 1.5 > 0) ? (int)(n / 1.5) : 1;
 
 				if (n <= 0 || m <= 1) {
@@ -214,7 +215,7 @@ public class GameCycle {
 					case ("stop") :
 						System.exit(0);
 					case ("add") :
-						if (iterForTowers > 0 && lstTowers.size() <= numberOfTowersSimultaniously) {
+						if (towerPoints > 0 && lstTowers.size() <= numberOfTowersSimultaniously) {
 							addNewTower(scan, lstTowers, lstEnemies, map);
 						} else {
 							System.out.println("Oops! You can't add more Towers.\nThere are too many Towers on the map or you're run out of Towers.");
@@ -235,7 +236,7 @@ public class GameCycle {
 	static void addNewTower(Scanner scan, HashMap<Long, Tower> lstTowers,
 							HashMap<Long, Enemy> lstEnemies, char[][] map) {
 		String[] tmp = new String[3];
-		int x = 0, y = 0, n = map.length, m = map[0].length;
+		int x, y, n = map.length, m = map[0].length;
 		System.out.println("Please input the type of Tower \"strong\" or \"regular\" and the coordinates 0<=x<" + (m-1) + " and 0<=y<" + n +
 				". The numbers have to be integers.");
 		while (true) {
@@ -256,14 +257,18 @@ public class GameCycle {
 				else {
 					long a = coordHash(x,y);
 					if (!lstTowers.containsKey(a) && !lstEnemies.containsKey(a)) {
-						if (tmp[0].equals("regular")) {
+						if (tmp[0].equals("regular") && towerPoints >= RegularTower.cost) {
 							lstTowers.put(a, new RegularTower(x, y));
 							map[y][x] = RegularTower.graphic;
-							iterForTowers -= RegularTower.getId();
-						} else {
+							towerPoints -= RegularTower.cost;
+						} else if (tmp[0].equals("strong") && towerPoints >= StrongTower.cost){
 							lstTowers.put(a, new StrongTower(x, y));
 							map[y][x] = StrongTower.graphic;
-							iterForTowers -= StrongTower.getId();
+							towerPoints -= StrongTower.cost;
+						}
+						else {
+							System.out.println("You have not enough points!");
+							continue;
 						}
 					}
 					else {
@@ -296,6 +301,12 @@ public class GameCycle {
 					} else {
 						long a = coordHash(x, y);
 						if (towers.containsKey(a)) {
+							if (towers.get(a) instanceof StrongTower) {
+								towerPoints+=StrongTower.cost;
+							}
+							else if (towers.get(a) instanceof RegularTower) {
+								towerPoints+=RegularTower.cost;
+							}
 							towers.remove(a);
 							map[y][x] = '*';
 						} else {

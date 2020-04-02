@@ -1,23 +1,19 @@
 package TDEntities;
 
 public class Tower extends GameEntity {
-	private int					healthPoints = 1;
-	private final int			dmgPoints = 50;
-	private final int			speed = 0;
+	protected int				healthPoints = 1;
+	protected int				dmgPoints = 50;
+	protected final int			speed = 0;
 	private int					xCoord;
 	private int					yCoord;
-	private final int 			rangeOfAttack = 5;
-	private static final int 	id = 1;
+	protected int 				rangeOfAttack = 5;
+	public static final int 	id = 0;
 	public static final char 	graphic = 'T';
 
 	//other variables are basic
 	public Tower(int xCoord, int yCoord) {
 		this.xCoord = xCoord;
 		this.yCoord = yCoord;
-	}
-
-	public static int getId() {
-		return id;
 	}
 
 	@Override
