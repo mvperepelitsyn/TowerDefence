@@ -1,6 +1,8 @@
 package TDGame;
 
 import TDEntities.Enemy;
+import TDEntities.RegularTower;
+import TDEntities.StrongTower;
 import TDEntities.Tower;
 
 import java.util.*;
@@ -211,7 +213,6 @@ public class GameCycle {
 					case ("add") :
 						if (iterForTowers > 0 && lstTowers.size() <= numberOfTowersSimultaniously) {
 							addNewTower(scan, lstTowers, lstEnemies, map);
-							iterForTowers--;
 						} else {
 							System.out.println("Oops! You can't add more Towers.\nThere are too many Towers on the map or you're run out of Towers.");
 						}
@@ -230,16 +231,21 @@ public class GameCycle {
 
 	static void addNewTower(Scanner scan, HashMap<Long, Tower> lstTowers,
 							HashMap<Long, Enemy> lstEnemies, char[][] map) {
-		String[] tmp = new String[2];
+		String[] tmp = new String[3];
 		int x = 0, y = 0, n = map.length, m = map[0].length;
-		System.out.println("Please input 0<=x<" + (m-1) + " and 0<=y<" + n +
-				". The coordinates of tower. The numbers have to be integers.");
+		System.out.println("Please input the type of Tower \"strong\" or \"regular\" and the coordinates 0<=x<" + (m-1) + " and 0<=y<" + n +
+				". The numbers have to be integers.");
 		while (true) {
 			try {
 				tmp[0] = scan.next();
 				tmp[1] = scan.next();
-				x = Integer.parseInt(tmp[0]);
-				y = Integer.parseInt(tmp[1]);
+				tmp[2] = scan.next();
+				x = Integer.parseInt(tmp[1]);
+				y = Integer.parseInt(tmp[2]);
+				if (!(tmp[0].equals("regular") || tmp[0].equals("strong"))) {
+					System.out.println("Wrong type of Tower. Try again:");
+					continue;
+				}
 				if (x < 0 || y < 0 || y >= n || x >= m - 1) {
 					System.out.println("The coordinates are out of reach. Try again:");
 					continue;
@@ -247,8 +253,15 @@ public class GameCycle {
 				else {
 					long a = coordHash(x,y);
 					if (!lstTowers.containsKey(a) && !lstEnemies.containsKey(a)) {
-						lstTowers.put(a, new Tower(x,y));
-						map[y][x] = Tower.graphic;
+						if (tmp[0].equals("regular")) {
+							lstTowers.put(a, new RegularTower(x, y));
+							map[y][x] = RegularTower.graphic;
+							iterForTowers -= RegularTower.getId();
+						} else {
+							lstTowers.put(a, new StrongTower(x, y));
+							map[y][x] = StrongTower.graphic;
+							iterForTowers -= StrongTower.getId();
+						}
 					}
 					else {
 						System.out.println("Tower already exists or there is the enemy!");
