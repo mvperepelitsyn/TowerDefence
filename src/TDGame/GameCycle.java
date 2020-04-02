@@ -66,15 +66,15 @@ public class GameCycle {
 		HashMap<Long, Enemy> new_enemies = new LinkedHashMap<>();
 
 		/* turn */
-		Iterator it_e = enemies.entrySet().iterator();
+		Iterator<Map.Entry<Long,Enemy>> it_e = enemies.entrySet().iterator();
 		// iteration on each enemy
 		enemy: while (it_e.hasNext()) {
 			//get enemy
-			Map.Entry pair_enemy = (Map.Entry)it_e.next();
-			Enemy tmp_enemy = (Enemy) pair_enemy.getValue();
+			Map.Entry<Long,Enemy> pair_enemy = it_e.next();
+			Enemy tmp_enemy = pair_enemy.getValue();
 
 			//iteration on each tower
-			Iterator it_t = towers.entrySet().iterator();
+			Iterator<Map.Entry<Long,Tower>> it_t = towers.entrySet().iterator();
 			//coords of the enemy and speed
 			int x_en = tmp_enemy.getxCoord();
 			int y_en = tmp_enemy.getyCoord();
@@ -83,8 +83,8 @@ public class GameCycle {
 			//iteration through each tower
 			while (it_t.hasNext()) {
 				//get tower
-				Map.Entry pair_tower = (Map.Entry)it_t.next();
-				Tower tmp_tower = (Tower) pair_tower.getValue();
+				Map.Entry<Long, Tower> pair_tower = it_t.next();
+				Tower tmp_tower = pair_tower.getValue();
 				//coords of the tower (it is necessary for deleting)
 				int x_t = tmp_tower.getxCoord();
 				int y_t = tmp_tower.getyCoord();
@@ -95,26 +95,35 @@ public class GameCycle {
 				int range_enemy = tmp_enemy.getRangeOfAttack();
 
 				//if distance == -1 => enemy and tower not on one line
-				if (distance != - 1) {
-					//tower attack
-					if (distance <= range_tower) {
-						tmp_enemy.setHealthPoints(tmp_enemy.getHealthPoints() - tmp_tower.getDmgPoints());
-					}
+				if (distance != -1) {
+					int tower_health = tmp_tower.getHealthPoints();
+					int enemy_health = tmp_enemy.getHealthPoints();
+
 					//enemy attack
 					if (distance <= range_enemy) {
-						tmp_tower.setHealthPoints(tmp_tower.getHealthPoints() - tmp_enemy.getDmgPoints());
+						tower_health -= tmp_enemy.getDmgPoints();
+						tmp_tower.setHealthPoints(tower_health);
+
+						//tower killed
+						if (tower_health <= 0) {
+							//System.out.println("tower destroy");
+							it_t.remove();
+							map[y_t][x_t] = '*';
+						}
 					}
-					//enemy killed
-					if (tmp_enemy.getHealthPoints() <= 0) {
-						//iterForEnemies--;
-						it_e.remove();
-						map[y_en][x_en] = '*';
-						continue enemy;
-					}
-					//tower killed
-					if (tmp_tower.getHealthPoints() <= 0) {
-						it_t.remove();
-						map[y_t][x_t] = '*';
+
+					//tower attack
+					if (distance <= range_tower) {
+						enemy_health -= tmp_tower.getDmgPoints();
+						tmp_enemy.setHealthPoints(enemy_health);
+
+						//enemy killed
+						if (enemy_health <= 0) {
+							//iterForEnemies--;
+							it_e.remove();
+							map[y_en][x_en] = '*';
+							continue enemy;
+						}
 					}
 				}
 			}
@@ -187,7 +196,7 @@ public class GameCycle {
 				m = Integer.parseInt(tmp[1]);
 				iterForEnemies = ((n * m) / 2 > 0) ? (n * m) / 2 : 3;
 				//towerPoints = (iterForEnemies / 2 > 0) ? iterForEnemies / 2 : 2;
-				towerPoints = (int) (Math.sqrt(iterForEnemies) * 2);
+				towerPoints = (int) (Math.sqrt(iterForEnemies) * 2.5);
 				//numberOfTowersSimultaniously = (n / 1.5 > 0) ? (int)(n / 1.5) : 1;
 				numberOfTowersSimultaniously = (int) (n*1.2);
 
