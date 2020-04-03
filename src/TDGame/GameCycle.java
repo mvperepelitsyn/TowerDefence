@@ -233,43 +233,41 @@ public class GameCycle {
 		boolean	flagAction = true;
 		while (flagAction) {
 			strAction = scan.nextLine().trim();
-			if (strAction != null) {
-				switch (strAction) {
-					case ("usage") :
-						System.out.printf("Actions:\nadd - to add new Tower\n" +
-								"delete - to delete an old Tower\n" +
-								"skip - to skip the turn\n" +
-								"stop - to stop the game\n");
-						break;
-					case ("stop") :
-						System.out.println("You've stopped the game. See you later!");
-						System.exit(0);
-					case ("add") :
-						if (towerPoints > 0 && lstTowers.size() <= numberOfTowersSimultaniously) {
-							if (!addNewTower(scan, lstTowers, lstEnemies, map)) {
-								System.out.println("Please input the action, that you want to perform. Type \"usage\" " +
-										"if you don't know the actions.");
-								break;
-							}
-						} else {
-							System.out.println("Oops! You can't add more Towers.\nThere are too many Towers on the map or you're run out of Towers.");
-						}
-						flagAction = false;
-						break;
-					case ("delete") :
-						if (!deleteTower(scan, lstTowers, map)) {
+			switch (strAction) {
+				case ("usage") :
+					System.out.printf("Actions:\nadd - to add new Tower\n" +
+							"delete - to delete an old Tower\n" +
+							"skip - to skip the turn\n" +
+							"stop - to stop the game\n");
+					break;
+				case ("stop") :
+					System.out.println("You've stopped the game. See you later!");
+					System.exit(0);
+				case ("add") :
+					if (towerPoints > 0 && lstTowers.size() <= numberOfTowersSimultaniously) {
+						if (!addNewTower(scan, lstTowers, lstEnemies, map)) {
 							System.out.println("Please input the action, that you want to perform. Type \"usage\" " +
 									"if you don't know the actions.");
 							break;
 						}
-						flagAction  = false;
+					} else {
+						System.out.println("Oops! You can't add more Towers.\nThere are too many Towers on the map or you're run out of Towers.");
+					}
+					flagAction = false;
+					break;
+				case ("delete") :
+					if (!deleteTower(scan, lstTowers, map)) {
+						System.out.println("Please input the action, that you want to perform. Type \"usage\" " +
+								"if you don't know the actions.");
 						break;
-					case ("skip") :
-						flagAction = false;
-						break;
-					default:
-						System.out.println("Unknown action. Try again.");
-				}
+					}
+					flagAction  = false;
+					break;
+				case ("skip") :
+					flagAction = false;
+					break;
+				default:
+					System.out.println("Unknown action. Try again.");
 			}
 		}
 	}
@@ -399,18 +397,19 @@ public class GameCycle {
 	}
 
 	static void addEnemy(HashMap<Long, Tower> towers, HashMap<Long, Enemy> enemies, char[][] map) {
-		int rndRow, count = (map.length / 3 > 0) ? map.length / 3 : 1;
+		int n = map.length, m = map[0].length;
+		int rndRow, count = (n / 3 > 0) ? n / 3 : 1;
 		long a;
 		Random rnd = new Random();
 		for (int i = 0; i < count; i++) {
-			rndRow = rnd.nextInt(map.length);
-			a = coordHash(map[0].length - 1, rndRow);
-			int b = ((map[0].length - 1) / 3) + 1;
+			rndRow = rnd.nextInt(n);
+			a = coordHash(m - 1, rndRow);
+			int b = ((m- 1) / 3) + 1;
 			if ((!(towers.containsKey(a) || enemies.containsKey(a))) && iterForEnemies > 0) {
 				enemies.put(a, new Enemy(rnd.nextInt(100) + 1, rnd.nextInt(100) + 1,
-						rnd.nextInt(4) + 1, map[0].length - 1, rndRow,
-						rnd.nextInt(3) + 1));
-				map[rndRow][map[0].length - 1] = Enemy.graphic;
+						rnd.nextInt(m / 6 + 1) + 1, m - 1, rndRow,
+						rnd.nextInt(m / 6+ 1) + 1));
+				map[rndRow][m - 1] = Enemy.graphic;
 				iterForEnemies--;
 			}
 		}
