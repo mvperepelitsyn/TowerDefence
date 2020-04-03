@@ -231,7 +231,7 @@ public class GameMap {
 		System.out.println("Please input the type of Tower \"strong\" or \"regular\" and the coordinates 0<=x<" + (m-1) + " and 0<=y<" + n +
 				". The numbers have to be integers.\nIf you changed your mind and don't want to add a Tower or you don't have enough points then input \"again\".");
 		System.out.println("Strong Tower characteristics: cost = 6, health = 150, damage = 70, attack range = 5");
-		System.out.println("Regular Tower characteristics: cost = 3, health = 100, damage = 25, attack range = 3");
+		System.out.println("Regular Tower characteristics: cost = 2, health = 100, damage = 25, attack range = 3");
 		while (true) {
 			try {
 				tmpStr = scan.nextLine().trim().toLowerCase();
@@ -259,7 +259,7 @@ public class GameMap {
 				}
 				else {
 					long a = coordHash(x,y);
-					if (!towers.containsKey(a) && !towers.containsKey(a)) {
+					if (!towers.containsKey(a) && !enemies.containsKey(a)) {
 						if (tmp[0].equals("regular") && towerPoints >= RegularTower.cost) {
 							RegularTower reg = new RegularTower(x,y);
 							towers.put(a, reg);
