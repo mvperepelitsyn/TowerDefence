@@ -56,7 +56,7 @@ public class GameCycle {
 			Tower tmp = entry.getValue();
 			System.out.println("x: " + tmp.getxCoord() + " y: " + tmp.getyCoord() + " h: " +
 					tmp.getHealthPoints() + " d: " + tmp.getDmgPoints() + " s: " + tmp.getSpeed() +
-					" r: " + tmp.getRangeOfAttack() + " type: " + tmp.getGraphic());
+					" r: " + tmp.getRangeOfAttack() + " type: " + tmp.getClass().getSimpleName() + " symbol: " + tmp.getGraphic());
 		}
 		System.out.println("Enemy list: ");
 		if (enemies.size() == 0) {
@@ -66,7 +66,7 @@ public class GameCycle {
 			Enemy tmp = entry.getValue();
 			System.out.println("x: " + tmp.getxCoord() + " y: " + tmp.getyCoord() + " h: " +
 					tmp.getHealthPoints() + " d: " + tmp.getDmgPoints() + " s: " + tmp.getSpeed() +
-					" r: " + tmp.getRangeOfAttack() + " type: " + tmp.getGraphic());
+					" r: " + tmp.getRangeOfAttack() + " type: " + tmp.getClass().getSimpleName() + " symbol: " + tmp.getGraphic());
 		}
 	}
 
@@ -238,7 +238,7 @@ public class GameCycle {
 		String	strAction;
 		boolean	flagAction = true;
 		while (flagAction) {
-			strAction = scan.nextLine().trim();
+			strAction = scan.nextLine().trim().toLowerCase();
 			switch (strAction) {
 				case ("usage") :
 					System.out.printf("Actions:\nadd - to add new Tower\n" +
@@ -289,7 +289,7 @@ public class GameCycle {
 		System.out.println("Regular Tower characteristics: cost = 3, health = 100, damage = 25, attack range = 3");
 		while (true) {
 			try {
-				tmpStr = scan.nextLine().trim();
+				tmpStr = scan.nextLine().trim().toLowerCase();
 				tmp = tmpStr.split(" ");
 				if (tmp[0].equals("again")) {
 					if (tmp.length == 1) {
