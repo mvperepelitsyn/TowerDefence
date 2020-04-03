@@ -1,9 +1,6 @@
 package TDGame;
 
-import TDEntities.Enemy;
-import TDEntities.RegularTower;
-import TDEntities.StrongTower;
-import TDEntities.Tower;
+import TDEntities.*;
 
 import java.util.*;
 
@@ -27,8 +24,9 @@ public class GameCycle {
 		while (iterForEnemies + enemies.size() > 0 && lives > 0) {
 			System.out.println("Lives left: " + lives);
 			System.out.println("Gold for tower: "+ towerPoints);
-			System.out.println("Towers can be added on field: "+ (numberOfTowersSimultaniously - towers.size()));
-			System.out.println("Enemy left: "+ (iterForEnemies + enemies.size()));
+			System.out.println("Towers can be added on field: " + (numberOfTowersSimultaniously - towers.size()));
+			System.out.println("Enemy left: " + ((iterForEnemies + enemies.size() > 0) ?
+					(iterForEnemies + enemies.size()) : "No enemies left"));
 			//player input
 			action(scan, towers, enemies, map);
 			//towers and enemy fight
@@ -51,18 +49,24 @@ public class GameCycle {
 
 	private static void showLists(HashMap<Long, Tower> towers, HashMap<Long, Enemy> enemies) {
 		System.out.println("Tower list: ");
+		if (towers.size() == 0) {
+			System.out.println("No towers");
+		}
 		for (Map.Entry<Long, Tower> entry : towers.entrySet()) {
 			Tower tmp = entry.getValue();
 			System.out.println("x: " + tmp.getxCoord() + " y: " + tmp.getyCoord() + " h: " +
 					tmp.getHealthPoints() + " d: " + tmp.getDmgPoints() + " s: " + tmp.getSpeed() +
-					" r: " + tmp.getRangeOfAttack());
+					" r: " + tmp.getRangeOfAttack() + " type: " + tmp.getGraphic());
 		}
 		System.out.println("Enemy list: ");
+		if (enemies.size() == 0) {
+			System.out.println("No enemies");
+		}
 		for (Map.Entry<Long, Enemy> entry : enemies.entrySet()) {
 			Enemy tmp = entry.getValue();
 			System.out.println("x: " + tmp.getxCoord() + " y: " + tmp.getyCoord() + " h: " +
 					tmp.getHealthPoints() + " d: " + tmp.getDmgPoints() + " s: " + tmp.getSpeed() +
-					" r: " + tmp.getRangeOfAttack());
+					" r: " + tmp.getRangeOfAttack() + " type: " + tmp.getGraphic());
 		}
 	}
 
@@ -143,7 +147,8 @@ public class GameCycle {
 
 			//check if the enemy can move with it speed (no barriers)
 			for (int i = x_en - 1; i >= low; i--) {
-				if (map[y_en][i] == 'T' || map[y_en][i] == 'E' || map[y_en][i] == 't') {
+				if (map[y_en][i] == 'T' || map[y_en][i] == 'E' || map[y_en][i] == 't' || map[y_en][i] == 'z'
+						|| map[y_en][i] == 'Z' || map[y_en][i] == 's' || map[y_en][i] == 'S') {
 					distance = x_en - i;
 					break;
 				}
@@ -169,7 +174,7 @@ public class GameCycle {
 				//if x > 0 than we don't lose. lose otherwise (because we can't create new tower)
 				if (x_en > 0) {
 					//map[y_en][x_en] = 'E';
-					map[y_en][x_en] =tmp_enemy.getGraphic();
+					map[y_en][x_en] = tmp_enemy.getGraphic();
 					new_enemies.put(coordHash(x_en, y_en), tmp_enemy);
 				} else {
 					lives--;
@@ -322,7 +327,8 @@ public class GameCycle {
 							towerPoints -= StrongTower.cost;
 						}
 						else {
-							System.out.println("You don't have enough points!");
+							System.out.println("You don't have enough points! Change the type of the Tower or type" +
+									"\"again\" to get back to different actions.");
 							continue;
 						}
 					}
@@ -401,17 +407,40 @@ public class GameCycle {
 
 	static void addEnemy(HashMap<Long, Tower> towers, HashMap<Long, Enemy> enemies, char[][] map) {
 		int n = map.length, m = map[0].length;
-		int rndRow, count = (n / 3 > 0) ? n / 3 : 1;
+		int rndRow, rndEnemy, count = (n / 3 > 0) ? n / 3 : 1;
 		long a;
+		Enemy tmp;
 		Random rnd = new Random();
 		for (int i = 0; i < count; i++) {
 			rndRow = rnd.nextInt(n);
 			a = coordHash(m - 1, rndRow);
 			int b = ((m- 1) / 3) + 1;
 			if ((!(towers.containsKey(a) || enemies.containsKey(a))) && iterForEnemies > 0) {
-				Enemy tmp = new Enemy(rnd.nextInt(100) + 1, rnd.nextInt(100) + 1,
-						rnd.nextInt(m / 6 + 1) + 1, m - 1, rndRow,
-						rnd.nextInt(m / 6+ 1) + 1);
+				rndEnemy = rnd.nextInt(4) + 1;
+				switch (rndEnemy) {
+					case (1) :
+						tmp = new RegularZombie(rnd.nextInt(75) + 1, rnd.nextInt(75) + 1,
+								rnd.nextInt(m / 6 + 1) + 1, m - 1, rndRow, 1);
+						break;
+					case (2) :
+						tmp = new BigZombie(rnd.nextInt(50) + 100, rnd.nextInt(25) + 25,
+								1, m - 1, rndRow, 1);
+						break;
+					case (3) :
+						tmp = new SkeletonArcher(rnd.nextInt(25) + 25, rnd.nextInt(25) + 75,
+								rnd.nextInt(m / 6 + 1) + 1, m - 1, rndRow,
+								rnd.nextInt(2) + 3);
+						break;
+					case (4) :
+						tmp = new SkeletonWarrior(rnd.nextInt(100) + 1, rnd.nextInt(25) + 75,
+								rnd.nextInt(m / 6 + 1) + 1, m - 1, rndRow,
+								rnd.nextInt(1) + 1);
+						break;
+					default:
+						tmp = new Enemy(rnd.nextInt(100) + 1, rnd.nextInt(100) + 1,
+								rnd.nextInt(m / 6 + 1) + 1, m - 1, rndRow,
+								rnd.nextInt(m / 6+ 1) + 1);
+				}
 				enemies.put(a, tmp);
 				map[rndRow][m - 1] = tmp.getGraphic();
 				iterForEnemies--;
