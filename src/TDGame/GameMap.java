@@ -272,7 +272,8 @@ public class GameMap {
 							towerPoints -= StrongTower.cost;
 						}
 						else {
-							System.out.println("You don't have enough points!");
+							System.out.println("You don't have enough points! Change the type of Tower or type \"again\"" +
+									" to input a different action.");
 							continue;
 						}
 					}
