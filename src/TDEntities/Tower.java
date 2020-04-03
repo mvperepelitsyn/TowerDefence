@@ -8,13 +8,17 @@ public class Tower extends GameEntity {
 	private int					xCoord;
 	private int					yCoord;
 	protected int 				rangeOfAttack = 5;
-	public static final int 	id = 0;
-	public static final char 	graphic = 'T';
+	public static final int 	cost = 0;
+	private static final char 	graphic = 'T';
 
 	//other variables are basic
 	public Tower(int xCoord, int yCoord) {
 		this.xCoord = xCoord;
 		this.yCoord = yCoord;
+	}
+
+	public char getGraphic() {
+		return graphic;
 	}
 
 	@Override

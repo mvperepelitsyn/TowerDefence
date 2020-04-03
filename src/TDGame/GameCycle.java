@@ -168,7 +168,8 @@ public class GameCycle {
 				it_e.remove();
 				//if x > 0 than we don't lose. lose otherwise (because we can't create new tower)
 				if (x_en > 0) {
-					map[y_en][x_en] = 'E';
+					//map[y_en][x_en] = 'E';
+					map[y_en][x_en] =tmp_enemy.getGraphic();
 					new_enemies.put(coordHash(x_en, y_en), tmp_enemy);
 				} else {
 					lives--;
@@ -310,12 +311,14 @@ public class GameCycle {
 					long a = coordHash(x,y);
 					if (!lstTowers.containsKey(a) && !lstEnemies.containsKey(a)) {
 						if (tmp[0].equals("regular") && towerPoints >= RegularTower.cost) {
-							lstTowers.put(a, new RegularTower(x, y));
-							map[y][x] = RegularTower.graphic;
+							RegularTower reg = new RegularTower(x,y);
+							lstTowers.put(a, reg);
+							map[y][x] = reg.getGraphic();
 							towerPoints -= RegularTower.cost;
 						} else if (tmp[0].equals("strong") && towerPoints >= StrongTower.cost){
-							lstTowers.put(a, new StrongTower(x, y));
-							map[y][x] = StrongTower.graphic;
+							StrongTower strong = new StrongTower(x,y);
+							lstTowers.put(a, strong);
+							map[y][x] = strong.getGraphic();
 							towerPoints -= StrongTower.cost;
 						}
 						else {
@@ -406,10 +409,11 @@ public class GameCycle {
 			a = coordHash(m - 1, rndRow);
 			int b = ((m- 1) / 3) + 1;
 			if ((!(towers.containsKey(a) || enemies.containsKey(a))) && iterForEnemies > 0) {
-				enemies.put(a, new Enemy(rnd.nextInt(100) + 1, rnd.nextInt(100) + 1,
+				Enemy tmp = new Enemy(rnd.nextInt(100) + 1, rnd.nextInt(100) + 1,
 						rnd.nextInt(m / 6 + 1) + 1, m - 1, rndRow,
-						rnd.nextInt(m / 6+ 1) + 1));
-				map[rndRow][m - 1] = Enemy.graphic;
+						rnd.nextInt(m / 6+ 1) + 1);
+				enemies.put(a, tmp);
+				map[rndRow][m - 1] = tmp.getGraphic();
 				iterForEnemies--;
 			}
 		}

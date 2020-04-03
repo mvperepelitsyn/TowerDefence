@@ -8,7 +8,7 @@ public class Enemy extends GameEntity {
 	private int					yCoord;
 	private int 				rangeOfAttack;
 	public final static int		id = 2;
-	public static final char 	graphic = 'E';
+	private static final char 	graphic = 'E';
 
 	public Enemy(int healthPoints, int dmgPoints, int speed, int xCoord, int yCoord, int rangeOfAttack) {
 		this.healthPoints = healthPoints;
@@ -17,6 +17,10 @@ public class Enemy extends GameEntity {
 		this.xCoord = xCoord;
 		this.yCoord = yCoord;
 		this.rangeOfAttack = rangeOfAttack;
+	}
+
+	public char getGraphic() {
+		return graphic;
 	}
 
 	@Override
