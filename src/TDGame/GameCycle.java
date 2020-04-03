@@ -12,6 +12,7 @@ public class GameCycle {
 	static int iterForEnemies;
 	static int towerPoints;
 	static int numberOfTowersSimultaniously;
+	static int lives = 3;
 
 	public static void gameCycle() {
 		Scanner scan = new Scanner(System.in);
@@ -23,7 +24,8 @@ public class GameCycle {
 		//we use linked to get correct iteration through enemies and towers
 		HashMap<Long, Tower> towers = new LinkedHashMap<Long, Tower>();
 		HashMap<Long, Enemy> enemies = new LinkedHashMap<Long, Enemy>();
-		while (iterForEnemies + enemies.size() > 0) {
+		while (iterForEnemies + enemies.size() > 0 && lives > 0) {
+			System.out.println("Lives left: " + lives);
 			System.out.println("Gold for tower: "+ towerPoints);
 			System.out.println("Towers can be added on field: "+ (numberOfTowersSimultaniously - towers.size()));
 			System.out.println("Enemy left: "+ (iterForEnemies + enemies.size()));
@@ -40,7 +42,11 @@ public class GameCycle {
 			System.out.println();
 			towerPoints++;
 		}
-		System.out.println("Congratulations! You win!");
+		if (lives > 0) {
+			System.out.println("Congratulations! You won!");
+		} else {
+			System.out.println("You lost! Better luck next time!");
+		}
 	}
 
 	private static void showLists(HashMap<Long, Tower> towers, HashMap<Long, Enemy> enemies) {
@@ -165,8 +171,8 @@ public class GameCycle {
 					map[y_en][x_en] = 'E';
 					new_enemies.put(coordHash(x_en, y_en), tmp_enemy);
 				} else {
-					System.out.println("You were killed by enemy on y = " + y_en);
-					System.exit(0);
+					lives--;
+					System.out.println("You've lost one life. You were attacked by enemy on y = " + y_en + ". The enemy has been annihilated.");
 				}
 			}
 		}
@@ -189,8 +195,9 @@ public class GameCycle {
 		int n = 0, m = 0;
 		String		tmpStr;
 		String[]	tmp;
+		boolean		flag = true;
 		System.out.println("Please input n and m. The size of the map. The numbers have to be integers.");
-		while (true) {
+		while (flag) {
 			try {
 				tmpStr = scan.nextLine().trim();
 				tmp = tmpStr.split(" ");
@@ -200,19 +207,17 @@ public class GameCycle {
 				//towerPoints = (iterForEnemies / 2 > 0) ? iterForEnemies / 2 : 2;
 				towerPoints = (int) (Math.sqrt(iterForEnemies) * 2.5);
 				//numberOfTowersSimultaniously = (n / 1.5 > 0) ? (int)(n / 1.5) : 1;
-				numberOfTowersSimultaniously = (int) (n*1.2);
+				numberOfTowersSimultaniously = (int) (n * 1.2);
 
 				if (tmp.length > 2) {
 					System.out.println("Wrong format of input data. Try again.");
-					continue;
 				} else if (n <= 0 || m <= 1) {
 					System.out.println("N is less than 1 or M less than 2. Make it greater.");
-					continue;
 				} else if ((long)n * m > 2147483647) {
 					System.out.println("The numbers are too big for a map (n * m > 2147483647). Make them smaller.");
-					continue;
+				} else {
+					flag = false;
 				}
-				break;
 			} catch (InputMismatchException | NumberFormatException | OutOfMemoryError | ArrayIndexOutOfBoundsException e) {
 				System.out.println("Error. Wrong format of input data. Try again.");
 			}
@@ -224,8 +229,9 @@ public class GameCycle {
 					   HashMap<Long, Enemy> lstEnemies, char[][] map) {
 		System.out.println("Please input the action, that you want to perform. Type \"usage\" " +
 				"if you don't know the actions.");
-		String strAction;
-		loop : while (true) {
+		String	strAction;
+		boolean	flagAction = true;
+		while (flagAction) {
 			strAction = scan.nextLine().trim();
 			if (strAction != null) {
 				switch (strAction) {
@@ -236,27 +242,31 @@ public class GameCycle {
 								"stop - to stop the game\n");
 						break;
 					case ("stop") :
+						System.out.println("You've stopped the game. See you later!");
 						System.exit(0);
 					case ("add") :
 						if (towerPoints > 0 && lstTowers.size() <= numberOfTowersSimultaniously) {
 							if (!addNewTower(scan, lstTowers, lstEnemies, map)) {
 								System.out.println("Please input the action, that you want to perform. Type \"usage\" " +
 										"if you don't know the actions.");
-								continue;
+								break;
 							}
 						} else {
 							System.out.println("Oops! You can't add more Towers.\nThere are too many Towers on the map or you're run out of Towers.");
 						}
-						break loop;
+						flagAction = false;
+						break;
 					case ("delete") :
 						if (!deleteTower(scan, lstTowers, map)) {
 							System.out.println("Please input the action, that you want to perform. Type \"usage\" " +
 									"if you don't know the actions.");
-							continue;
+							break;
 						}
-						break loop;
+						flagAction  = false;
+						break;
 					case ("skip") :
-						break loop;
+						flagAction = false;
+						break;
 					default:
 						System.out.println("Unknown action. Try again.");
 				}
