@@ -80,6 +80,8 @@ public class GameCycle {
 			int y_en = tmp_enemy.getyCoord();
 			int speed_enemy = tmp_enemy.getSpeed();
 
+			//each enemy attack all towers that he can
+			boolean enemy_dead = false;
 			//iteration through each tower
 			while (it_t.hasNext()) {
 				//get tower
@@ -99,7 +101,13 @@ public class GameCycle {
 					int tower_health = tmp_tower.getHealthPoints();
 					int enemy_health = tmp_enemy.getHealthPoints();
 
-					//enemy attack
+					//tower attacks
+					if (distance <= range_tower) {
+						enemy_health -= tmp_tower.getDmgPoints();
+						tmp_enemy.setHealthPoints(enemy_health);
+						enemy_dead = (enemy_health <= 0);
+					}
+					//enemy attacks
 					if (distance <= range_enemy) {
 						tower_health -= tmp_enemy.getDmgPoints();
 						tmp_tower.setHealthPoints(tower_health);
@@ -111,21 +119,15 @@ public class GameCycle {
 							map[y_t][x_t] = '*';
 						}
 					}
-
-					//tower attack
-					if (distance <= range_tower) {
-						enemy_health -= tmp_tower.getDmgPoints();
-						tmp_enemy.setHealthPoints(enemy_health);
-
-						//enemy killed
-						if (enemy_health <= 0) {
-							//iterForEnemies--;
-							it_e.remove();
-							map[y_en][x_en] = '*';
-							continue enemy;
-						}
-					}
 				}
+			}
+
+			//enemy killed by one of the tower
+			if (enemy_dead) {
+				//iterForEnemies--;
+				it_e.remove();
+				map[y_en][x_en] = '*';
+				continue;
 			}
 			//we reach this point if enemy is alive
 			//turn the enemy to the next position
